@@ -10,14 +10,14 @@
         </form>
         <div class="ml-3">
             {% if user.is_authenticated %}
-                <form id="logout-form" method="post" action="#" style="display: none;">
+                <form id="logout-form" method="post" action="{% url 'account_logout' %}" style="display: none;">
                     {% csrf_token %}
                 </form>
-                <button class="btn btn-secondary" onclick="">Sair</button>
-                <a class="btn btn-outline-secondary ml-2" href="#">Minha Conta</a>
+                <button class="btn btn-secondary" onclick="document.getElementById('logout-form').submit();">Sair</button>
+                <a class="btn btn-outline-secondary ml-2" href="{% url 'account_change_password' %}">Minha Conta</a>
             {% else %}
-                <a class="btn btn-outline-secondary" href="#">Entrar</a>
-                <a class="btn btn-secondary ml-2" href="#">Cadastrar</a>
+                <a class="btn btn-outline-secondary" href="{% url 'account_login' %}">Entrar</a>
+                <a class="btn btn-secondary ml-2" href="{% url 'account_signup' %}">Cadastrar</a>
             {% endif %}
         </div>
     </div>
@@ -29,15 +29,15 @@
     <div class="collapse navbar-collapse" id="navbarNav2">
         <ul class="navbar-nav mx-auto">
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'home' %}" style="transition: color 0.3s; color:#fff;">Início</a>
+                <a class="nav-link" href="{% url 'home' %}" style="transition: color 0.3s; color:#fff;">Página Inicial</a>
             </li>
             <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="" id="leiloesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="transition: color 0.3s;color:#fff;">
+                <a class="nav-link dropdown-toggle" href="#" id="leiloesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="transition: color 0.3s;color:#fff;">
                     Leilões
                 </a>
                 <div class="dropdown-menu" aria-labelledby="leiloesDropdown">
-                    <a class="dropdown-item" href="{% url 'auction_management:leiloes_ao_vivo' %}">Leilões Ao Vivo</a>
-                    <a class="dropdown-item" href="{% url 'auction_management:calendario' %}">Calendário</a>
+                    <a class="dropdown-item" href="#">Leilões Ao Vivo</a>
+                    <a class="dropdown-item" href="#">Calendário</a>
                 </div>
             </li>
             <li class="nav-item dropdown">

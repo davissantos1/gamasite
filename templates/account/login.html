@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  {% load static %} 
+  {% include '_head.html' %}
+  <body>
+    {% include '_header.html' %}
+    <div class="container form-container login-page">
+      <div class="row justify-content-center align-items-center ">
+        <div class="col-md-6 login-form">
+          <h2 class="text-center">Entrar</h2>
+          <form method="post" action="{% url 'account_login' %}">
+            {% csrf_token %} 
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-secondary btn-block">Entrar</button>
+          </form>
+          <p class="text-center mt-2">
+            <a href="{% url 'account_signup' %}" class="text-dark">Não tem uma conta? Cadastre-se</a>
+          </p>
+          <p class="text-center mt-2">
+            <a href="{% url 'account_reset_password' %}" class="text-dark">Esqueceu sua senha?</a>
+          </p>
+        </div>
+        <div class="col-md-6 d-none d-md-block">
+          <img src="{% static 'img/banner.jpeg' %}" alt="Banner" class="img-fluid login-banner">
+        </div>
+      </div>
+    </div>
+    {% include '_footer.html' %}
+  </body>
+</html>

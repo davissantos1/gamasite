@@ -24,5 +24,6 @@ urlpatterns = [
     path('auction_management/', include('auction_management.urls')),
     path('categories/', include('categories.urls')),
     #path('reviews/', include('reviews_ratings.urls')),
+    path('accounts/', include('allauth.urls')),
     
 ]

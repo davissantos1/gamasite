@@ -1,8 +1,6 @@
 body {
     background-color: #fff;
-    }
-    
-/* static/pages/css/style.css */
+}
 
 /* Estilizando o dropdown */
 .navbar .dropdown-menu {
@@ -34,154 +32,209 @@ body {
     margin-top: 0;
 }
 
+.navbar-brand img {
+    margin-left: 75px;
+    height: 70px;
+}
 
-    .navbar-brand img {
-        margin-left: 75px;
-        height: 70px ;
-    }
-    
-    .search-bar {
-        margin: auto;
-    }
-    
-    .search-nav{
-        width: 70% !important;
-    }
-    .form-container {
-        margin-top: 10px;
-    }
-    
-    .nav-link:hover {
-        text-decoration: underline;
-        text-decoration-color: white; /* Sublinhado branco */
-        color: inherit; /* Mantém a cor original */
-    }
-    
-    
-    .navbar {
-        padding: 1rem;
-    }
-    
-    
-    .search-bar {
-        flex-grow: 1;
-        max-width: 600px;
-        margin: 0 auto;
-    }
-    
-    .search-bar input {
-        width: 70%;
-    }
-    
-    .btn-outline-secondary {
-        border-color: #343a40;
-        color: #343a40;
-    }
-    
-    .btn-outline-secondary:hover {
-        background-color: #343a40;
-        color: white;
-    }
-    
-    .btn-secondary {
-        background-color: #343a40;
-        border-color: #343a40;
-    }
-    
-    .btn-secondary:hover {
-        background-color: #5a6268;
-        border-color: #545b62;
-    }
-    
-    .display-4 {
-        font-weight: 700;
-        color: #343a40;
-    }
-    
-    .lead {
-        font-size: 1.25rem;
-        font-weight: 300;
-    }
-    
-    .btn-lg {
-        padding: 0.75rem 1.25rem;
-        font-size: 1.25rem;
-    }
-    
-    .img-fluid {
-        max-width: 100%;
-        height: auto;
-        box-shadow: 0px 0px 0 #00000070;
-        border-top-left-radius: 80px;
-        border-top-right-radius: 20px;
-        border-bottom-left-radius: 20px;
-        border-bottom-right-radius: 20px;
-    }
-    .central-section {
-        padding: 60px 0;
-        background-color: #f8f9fa;
-    }
-    
-    .central-section .card {
-        margin-bottom: 30px;
-        border: none;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-    
-    .central-section .card-img-top {
-        height: 200px;
-        object-fit: cover;
-    }
-    
-    .central-section .card-body {
-        padding: 20px;
-    }
-    
-    .central-section .card-title {
-        font-size: 1.25rem;
-        font-weight: 700;
-    }
-    
-    .central-section .card-text {
-        font-size: 1rem;
-        color: #6c757d;
-    }
-    
-    #links{
-        background-color: #343a40;;
-        color:#fff;
-    }
-    
-    /* Estilos do Footer */
-    .footer {
-        background-color: #343a40; /* Fundo cinza escuro */
-        color: white;
-    }
-    
-    .footer a {
-        color: white;
-        text-decoration: none;
-    }
-    
-    .footer a:hover {
-        text-decoration: underline;
-    }
-    
-    .footer h5 {
-        font-size: 1.25rem;
-        font-weight: 700;
-    }
-    
-    .footer p {
-        font-size: 1rem;
-        color: #b1b1b1;
-    }
-    
-    .footer .text-center {
-        background-color: rgba(0, 0, 0, 0.2);
-        padding: 1rem 0; /* Adiciona padding para melhorar o espaçamento */
-    }
-    
+.search-bar {
+    margin: auto;
+    flex-grow: 1;
+    max-width: 600px;
+}
 
+.search-nav {
+    width: 70% !important;
+}
 
-    
+.form-container {
+    margin-top: 10px;
+}
+
+.nav-link:hover {
+    text-decoration: underline;
+    text-decoration-color: white; /* Sublinhado branco */
+    color: inherit; /* Mantém a cor original */
+}
+
+.navbar {
+    padding: 1rem;
+}
+
+.search-bar input {
+    width: 70%;
+}
+
+.btn-outline-secondary {
+    border-color: #343a40;
+    color: #343a40;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #343a40;
+    color: white;
+}
+
+.btn-secondary {
+    background-color: #343a40;
+    border-color: #343a40;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+
+.display-4 {
+    font-weight: 700;
+    color: #343a40;
+}
+
+.lead {
+    font-size: 1.25rem;
+    font-weight: 300;
+}
+
+.btn-lg {
+    padding: 0.75rem 1.25rem;
+    font-size: 1.25rem;
+}
+
+.img-fluid {
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0px 0px 0 #00000070;
+    border-top-left-radius: 80px;
+    border-top-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+}
+
+.central-section {
+    padding: 60px 0;
+    background-color: #f8f9fa;
+}
+
+.central-section .card {
+    margin-bottom: 30px;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.central-section .card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
+
+.central-section .card-body {
+    padding: 20px;
+}
+
+.central-section .card-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.central-section .card-text {
+    font-size: 1rem;
+    color: #6c757d;
+}
+
+#links {
+    background-color: #343a40;
+    color: #fff;
+}
+
+/* Estilos do Footer */
+.footer {
+    background-color: #343a40; /* Fundo cinza escuro */
+    color: white;
+}
+
+.footer a {
+    color: white;
+    text-decoration: none;
+}
+
+.footer a:hover {
+    text-decoration: underline;
+}
+
+.footer h5 {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.footer p {
+    font-size: 1rem;
+    color: #b1b1b1;
+}
+
+.footer .text-center {
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 1rem 0; /* Adiciona padding para melhorar o espaçamento */
+}
+
+/* Estilos da página de login */
+body.login-page {
+    background-color: #f4f4f4;
+}
+
+.login-page .form-container {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.login-page h2 {
+    color: #333;
+}
+
+.login-page .login-form {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+}
+
+.login-page .login-form input {
+    margin-bottom: 10px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.login-page .login-form button {
+    padding: 10px;
+    background-color: #343a40; /* Cor cinza escuro */
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.login-page .login-form button:hover {
+    background-color: #5a6268;
+}
+
+.login-page .text-center {
+    text-align: center;
+    color: #666;
+}
+
+.login-page .text-center a {
+    color: #343a40; /* Cor cinza escuro */
+    text-decoration: none;
+}
+
+.login-page .text-center a:hover {
+    text-decoration: underline;
+}
+
+.login-page .img-fluid.login-banner {
+    border-radius: 8px;
+    max-width: 100%;
+    height: auto;
+}
