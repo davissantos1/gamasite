@@ -1,0 +1,32 @@
+# Ignore all Python bytecode files
+__pycache__/
+*.py[cod]
+
+# Ignore environment variables file
+.env
+
+# Ignore virtual environment directory
+env/
+venv/
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore log files
+*.log
+
+# Ignore compiled code
+*.o
+*.so
+*.out
+
+# Ignore node modules (if using Node.js)
+node_modules/
+
+# Ignore database files
+*.sqlite3
+
+# Ignore coverage reports
+coverage/
+.coverage

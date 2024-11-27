@@ -1,0 +1,62 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg navbar-light">
+    <a class="navbar-brand" href="{% url 'home' %}">
+        <img src="{% static 'pages/img/logo.png' %}" alt="Logo">
+    </a>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <form class="form-inline search-bar ml-auto">
+            <input class="form-control mr-sm-2 search-nav" type="search" placeholder="Pesquisar" aria-label="Pesquisar">
+            <button class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Pesquisar</button>
+        </form>
+        <div class="ml-3">
+            {% if user.is_authenticated %}
+                <form id="logout-form" method="post" action="#" style="display: none;">
+                    {% csrf_token %}
+                </form>
+                <button class="btn btn-secondary" onclick="">Sair</button>
+                <a class="btn btn-outline-secondary ml-2" href="#">Minha Conta</a>
+            {% else %}
+                <a class="btn btn-outline-secondary" href="#">Entrar</a>
+                <a class="btn btn-secondary ml-2" href="#">Cadastrar</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+<nav class="navbar navbar-expand-lg navbar-light mt-2" id="links">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav2" aria-controls="navbarNav2" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav2">
+        <ul class="navbar-nav mx-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'home' %}" style="transition: color 0.3s; color:#fff;">Início</a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="" id="leiloesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="transition: color 0.3s;color:#fff;">
+                    Leilões
+                </a>
+                <div class="dropdown-menu" aria-labelledby="leiloesDropdown">
+                    <a class="dropdown-item" href="{% url 'auction_management:leiloes_ao_vivo' %}">Leilões Ao Vivo</a>
+                    <a class="dropdown-item" href="{% url 'auction_management:calendario' %}">Calendário</a>
+                </div>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="categoriasDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="transition: color 0.3s;color:#fff;">
+                    Categorias
+                </a>
+                <div class="dropdown-menu" aria-labelledby="categoriasDropdown">
+                    <a class="dropdown-item" href="{% url 'categories:imoveis' %}">Imóveis</a>
+                    <a class="dropdown-item" href="{% url 'categories:veiculos' %}">Veículos</a>
+                    <a class="dropdown-item" href="{% url 'categories:rural' %}">Rural</a>
+                    <a class="dropdown-item" href="{% url 'categories:outros_bens' %}">Outros Bens</a>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" style="transition: color 0.3s;color:#fff;">Contato</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" style="transition: color 0.3s;color:#fff;">Como Participar</a>
+            </li>
+        </ul>
+    </div>
+</nav>

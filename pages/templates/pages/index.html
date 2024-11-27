@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+{% include '_head.html' %}
+<body>
+    {% include '_header.html' %}
+    <div class="container mt-5">
+        <!-- Seção de Introdução -->
+        <div class="row align-items-center main-section full-width">
+            <div class="col-md-6 text-center text-md-left mb-4 mb-md-0">
+                <span class="d-block text-secondary">Leilões Inovadores</span>
+                <h1 class="display-4">Descubra Oportunidades Únicas em Leilões Ao Vivo</h1>
+                <p class="lead">Participe de leilões emocionantes com segurança e transparência.</p>
+                <a href="#" class="btn btn-outline-secondary btn-lg">Participe Agora</a>
+            </div>
+            <div class="col-md-6">
+                <img src="{% static 'pages/img/pexels-photo-5668473.jpeg' %}" alt="Leilões" class="img-fluid">
+            </div>
+        </div>
+    </div>
+
+    <!-- Nova Seção Central -->
+    <div class="central-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card">
+                        <img src="{% static 'pages/img/pexels-photo-5668473.jpeg' %}" class="card-img-top" alt="Imagem 1">
+                        <div class="card-body">
+                            <h5 class="card-title">Leilão de Obras de Arte</h5>
+                            <p class="card-text">Encontre pinturas, esculturas e outras obras de arte únicas.</p>
+                            <a href="#" class="btn btn-outline-secondary">Ver Mais</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <img src="{% static 'pages/img/pexels-photo-5668802.jpeg' %}" class="card-img-top" alt="Imagem 2">
+                        <div class="card-body">
+                            <h5 class="card-title">Leilão de Antiguidades</h5>
+                            <p class="card-text">Descubra peças históricas e raridades de valor inestimável.</p>
+                            <a href="#" class="btn btn-outline-secondary">Ver Mais</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <img src="{% static 'pages/img/pexels-photo-5668474.jpeg' %}" class="card-img-top" alt="Imagem 3">
+                        <div class="card-body">
+                            <h5 class="card-title">Leilão de Veículos</h5>
+                            <p class="card-text">Encontre veículos clássicos e modernos em ótimas condições.</p>
+                            <a href="#" class="btn btn-outline-secondary">Ver Mais</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include '_footer.html' %}
+</body>
+</html>
