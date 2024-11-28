@@ -19,11 +19,10 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('pages.urls')),  # Inclui a URL da homepage
+    path('admin/', include('admin_custom.urls')),
+    path('', include('pages.urls')),  # URLs para o site do cliente
     path('auction_management/', include('auction_management.urls')),
     path('categories/', include('categories.urls')),
     #path('reviews/', include('reviews_ratings.urls')),
     path('accounts/', include('allauth.urls')),
-    
 ]

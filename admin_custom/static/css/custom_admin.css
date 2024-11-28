@@ -1,0 +1,32 @@
+/* custom_admin.css */
+.main-sidebar.sidebar-dark-gray {
+    background-color: #343a40; /* Cinza escuro */
+    color: #ffffff; /* Texto branco */
+}
+
+.main-sidebar.sidebar-dark-gray .user-panel > .image img {
+    border: 2px solid #ffffff; /* Borda branca ao redor da imagem */
+}
+
+.main-sidebar.sidebar-dark-gray .user-panel .info p,
+.main-sidebar.sidebar-dark-gray .user-panel .info a {
+    color: #ffffff; /* Texto branco */
+}
+
+.main-sidebar.sidebar-dark-gray .sidebar-menu > li > a {
+    color: #c2c7d0; /* Cor dos links */
+}
+
+.main-sidebar.sidebar-dark-gray .sidebar-menu > li > a:hover {
+    background: #1c1e21; /* Cor de fundo ao passar o mouse */
+    color: #ffffff; /* Texto branco */
+}
+
+.main-sidebar.sidebar-dark-gray .treeview-menu > li > a {
+    color: #b8c7ce; /* Cor dos sublinks */
+}
+
+.main-sidebar.sidebar-dark-gray .treeview-menu > li > a:hover {
+    background: #1c1e21; /* Cor de fundo ao passar o mouse nos sublinks */
+    color: #ffffff; /* Texto branco */
+}

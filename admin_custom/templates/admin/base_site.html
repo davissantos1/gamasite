@@ -1,0 +1,141 @@
+{% extends "adminlte/base.html" %}
+{% load static %}
+{% block title_outer %}
+    <title>{% block title %}Administração do Site{% endblock %}</title>
+{% endblock title_outer %}
+
+{% block stylesheets %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/custom_admin.css' %}">
+{% endblock stylesheets %}
+
+{% block nav_header %}
+    {% include "admin/partials/_navbar.html" %}
+{% endblock nav_header %}
+
+{% block nav_sidebar %}
+    {% include "admin/partials/_sidebar.html" %}
+{% endblock nav_sidebar %}
+
+{% block content_wrapper %}
+<div class="content-wrapper">
+    <section class="content-header">
+        <h1>
+            Bem-vindo(a), {{ user.first_name }}!
+            <small>Painel de Controle</small>
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'admin:index' %}"><i class="fa fa-dashboard"></i> Início</a></li>
+        </ol>
+    </section>
+
+    <section class="content">
+        <div class="row">
+            <div class="col-lg-3 col-xs-6">
+                <div class="small-box bg-aqua">
+                    <div class="inner">
+                        <h3>{{ users_count }}</h3>
+                        <p>Usuários Registrados</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fa fa-user"></i>
+                    </div>
+                    <a href="{% url 'admin:auth_user_changelist' %}" class="small-box-footer">Mais info <i class="fa fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-xs-6">
+                <div class="small-box bg-green">
+                    <div class="inner">
+                        <h3>{{ auctions_count }}</h3>
+                        <p>Leilões Ativos</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fa fa-gavel"></i>
+                    </div>
+                    <a href="" class="small-box-footer">Mais info <i class="fa fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-xs-6">
+                <div class="small-box bg-yellow">
+                    <div class="inner">
+                        <h3>{{ categories_count }}</h3>
+                        <p>Categorias</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fa fa-tags"></i>
+                    </div>
+                    <a href="" class="small-box-footer">Mais info <i class="fa fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-xs-6">
+                <div class="small-box bg-red">
+                    <div class="inner">
+                        <h3>{{ bids_count }}</h3>
+                        <p>Lances Recebidos</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fa fa-bell"></i>
+                    </div>
+                    <a href="" class="small-box-footer">Mais info <i class="fa fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="box">
+            <div class="box-header with-border">
+                <h3 class="box-title">Estatísticas Gerais</h3>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <p class="text-center">
+                            <strong>Lances Recebidos: Últimos 6 Meses</strong>
+                        </p>
+                        <div class="chart">
+                            <canvas id="salesChart" style="height: 180px;"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <p class="text-center">
+                            <strong>Progresso das Tarefas</strong>
+                        </p>
+
+                        <div class="progress-group">
+                            <span class="progress-text">Adicionar Descrição aos Itens</span>
+                            <span class="progress-number"><b>160</b>/200</span>
+                            <div class="progress sm">
+                                <div class="progress-bar progress-bar-aqua" style="width: 80%"></div>
+                            </div>
+                        </div>
+                        <div class="progress-group">
+                            <span class="progress-text">Fotografar Itens</span>
+                            <span class="progress-number"><b>310</b>/400</span>
+                            <div class="progress sm">
+                                <div class="progress-bar progress-bar-red" style="width: 75%"></div>
+                            </div>
+                        </div>
+                        <div class="progress-group">
+                            <span class="progress-text">Verificar Documentação</span>
+                            <span class="progress-number"><b>480</b>/800</span>
+                            <div class="progress sm">
+                                <div class="progress-bar progress-bar-green" style="width: 60%"></div>
+                            </div>
+                        </div>
+                        <div class="progress-group">
+                            <span class="progress-text">Finalizar Cadastro dos Usuários</span>
+                            <span class="progress-number"><b>250</b>/500</span>
+                            <div class="progress sm">
+                                <div class="progress-bar progress-bar-yellow" style="width: 50%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock content_wrapper %}
+
+{% block nav_footer %}
+            {% include 'admin/partials/_footer.html' %}
+{% endblock %}
