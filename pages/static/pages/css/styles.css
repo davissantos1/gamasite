@@ -175,12 +175,12 @@ body {
     padding: 1rem 0; /* Adiciona padding para melhorar o espaçamento */
 }
 
-/* Estilos da página de login */
-body.login-page {
+/* Estilos da página de cadastro */
+body.signup-page {
     background-color: #f4f4f4;
 }
 
-.login-page .form-container {
+.signup-page .form-container {
     margin-top: 20px;
     padding: 20px;
     background-color: #fff;
@@ -188,53 +188,37 @@ body.login-page {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.login-page h2 {
+.signup-page h2 {
     color: #333;
 }
 
-.login-page .login-form {
-    display: flex;
-    flex-direction: column;
-    margin: 0;
-    padding: 0;
+.signup-page .form-group {
+    margin-bottom: 15px;
 }
 
-.login-page .login-form input {
-    margin-bottom: 10px;
+.signup-page label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.signup-page input {
+    width: 100%;
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
 }
 
-.login-page .login-form button {
+.signup-page .btn-block {
     padding: 10px;
     background-color: #343a40; /* Cor cinza escuro */
     color: #fff;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    width: 100%;
 }
 
-.login-page .login-form button:hover {
+.signup-page .btn-block:hover {
     background-color: #5a6268;
-}
-
-.login-page .text-center {
-    text-align: center;
-    color: #666;
-}
-
-.login-page .text-center a {
-    color: #343a40; /* Cor cinza escuro */
-    text-decoration: none;
-}
-
-.login-page .text-center a:hover {
-    text-decoration: underline;
-}
-
-.login-page .img-fluid.login-banner {
-    border-radius: 8px;
-    max-width: 100%;
-    height: auto;
 }
