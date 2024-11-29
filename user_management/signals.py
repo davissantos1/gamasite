@@ -5,10 +5,13 @@ from django.contrib.auth.models import User
 from .models import Profile
 
 @receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
+def create_or_update_user_profile(sender, instance, created, **kwargs):
     if created:
-        Profile.objects.create(user=instance)
-
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
+        # Cria o perfil se não existir
+        Profile.objects.get_or_create(user=instance)
+    else:
+        # Se o perfil já existir, não faz nada
+        try:
+            instance.profile.save()
+        except instance.profile.DoesNotExist:
+            Profile.objects.create(user=instance)

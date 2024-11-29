@@ -172,3 +172,8 @@ ACCOUNT_SIGNUP_EMAIL_ENTERED = False
 ACCOUNT_SIGNUP_FORM_CLASS = 'user_management.forms.CustomSignupForm'
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/admin'
+
+
+# Email settings
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+

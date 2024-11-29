@@ -20,10 +20,13 @@
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                 <li class="nav-header">MAIN NAVIGATION</li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-tachometer-alt"></i>
-                        <p>Example Link</p>
-                    </a>
+                    <a href="{% url 'list-clients' %}" class="nav-link">Clientes</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'list-auctions' %}" class="nav-link"><i class="fa fa-gavel"></i> <span>Leilões</span></a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'list-items' %}" class="nav-link"><i class="fa fa-cubes"></i> <span>Itens</span></a>
                 </li>
                 <li class="nav-item">
                     <a href="#" class="nav-link active">
