@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+{% load static %}
+
+{% include '_head.html' %}
+
+<body>
+    {% include '_header.html' %}
+    
+    <div class="container mt-5">
+        <!-- Seção de Introdução -->
+        <div class="row align-items-center main-section full-width">
+            <div class="col-md-6 text-center text-md-left mb-4 mb-md-0">
+                <span class="d-block text-secondary">Leilão de Outros Bens</span>
+                <h1 class="display-4">Outros Bens Disponíveis para Leilão</h1>
+                <p class="lead">Confira os outros bens que estão sendo leiloados e suas características detalhadas.</p>
+            </div>
+            <div class="col-md-6">
+                <img src="{% static 'pages/img/pexels-photo-5668473.jpeg' %}" alt="Outros Bens" class="img-fluid">
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Outros Bens -->
+    <div class="container mt-5">
+        <h2 class="h3">Outros Bens em Leilão</h2>
+        <div class="row">
+            {% for bem in outros_bens %}
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <img src="{{ bem.imagem.url }}" alt="{{ bem.nome }}" class="card-img-top">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ bem.nome }}</h5>
+                        <p class="card-text">Categoria: {{ bem.categoria }}</p>
+                        <p class="card-text">Preço estimado: R$ {{ bem.preco_estima|floatformat:2 }}</p>
+                        <a href="{% url 'category_outros_bens_detail' bem.id %}" class="btn btn-secondary btn-block">Ver Detalhes</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-center">Nenhum bem disponível no momento.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% include '_footer.html' %}
+</body>
+</html>

@@ -2,8 +2,14 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from user_management.models import Profile
+from .models import Profile
 
 class CustomSignupForm(UserCreationForm):
+    username = forms.CharField(
+        max_length=150, 
+        label='Nome de Usuário', 
+        help_text='Obrigatório. 150 caracteres ou menos. Apenas letras, números e @/./+/-/_ são permitidos.'
+    )
     first_name = forms.CharField(max_length=30, label='Nome')
     last_name = forms.CharField(max_length=30, label='Sobrenome')
     email = forms.EmailField(max_length=254, label='E-mail', help_text='Um endereço de e-mail válido.')
@@ -30,6 +36,7 @@ class CustomSignupForm(UserCreationForm):
 
     def save(self, commit=True):
         user = super().save(commit=False)
+        user.username = self.cleaned_data['username']
         user.first_name = self.cleaned_data['first_name']
         user.last_name = self.cleaned_data['last_name']
         user.email = self.cleaned_data['email']
@@ -43,6 +50,7 @@ class CustomSignupForm(UserCreationForm):
         Aqui você pode adicionar a lógica para criar ou atualizar o perfil do usuário.
         """
         # Salvar informações do usuário
+        user.username = self.cleaned_data['username']
         user.first_name = self.cleaned_data['first_name']
         user.last_name = self.cleaned_data['last_name']
         user.email = self.cleaned_data['email']
@@ -66,3 +74,14 @@ class CustomSignupForm(UserCreationForm):
             profile.save()
 
         return user
+
+class ProfileEditForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['telefone_celular', 'cep', 'logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'estado', 'pais']
+
+
+class UserEditForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name']

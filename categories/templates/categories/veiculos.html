@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+{% load static %}
+
+{% include '_head.html' %}
+
+<body>
+    {% include '_header.html' %}
+    
+    <div class="container mt-5">
+        <!-- Seção de Introdução -->
+        <div class="row align-items-center main-section full-width">
+            <div class="col-md-6 text-center text-md-left mb-4 mb-md-0">
+                <span class="d-block text-secondary">Leilão de Veículos</span>
+                <h1 class="display-4">Veículos Disponíveis para Leilão</h1>
+                <p class="lead">Confira os veículos que estão sendo leiloados e suas características detalhadas.</p>
+            </div>
+            <div class="col-md-6">
+                <img src="{% static 'pages/img/pexels-photo-5668473.jpeg' %}" alt="Veículos" class="img-fluid">
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Veículos -->
+    <div class="container mt-5">
+        <h2 class="h3">Veículos em Leilão</h2>
+        <div class="row">
+            {% for veiculo in veiculos %}
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <img src="{{ veiculo.imagem.url }}" alt="{{ veiculo.modelo }}" class="card-img-top">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ veiculo.modelo }}</h5>
+                        <p class="card-text">Ano: {{ veiculo.ano }}</p>
+                        <p class="card-text">Marca: {{ veiculo.marca }}</p>
+                        <p class="card-text">Preço estimado: R$ {{ veiculo.preco_estima|floatformat:2 }}</p>
+                        <a href="{% url 'category_veiculos_detail' veiculo.id %}" class="btn btn-secondary btn-block">Ver Detalhes</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-center">Nenhum veículo disponível no momento.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% include '_footer.html' %}
+</body>
+</html>

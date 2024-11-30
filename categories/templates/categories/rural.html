@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+{% load static %}
+
+{% include '_head.html' %}
+
+<body>
+    {% include '_header.html' %}
+    
+    <div class="container mt-5">
+        <!-- Seção de Introdução -->
+        <div class="row align-items-center main-section full-width">
+            <div class="col-md-6 text-center text-md-left mb-4 mb-md-0">
+                <span class="d-block text-secondary">Leilão de Bens Rurais</span>
+                <h1 class="display-4">Bens Rurais Disponíveis para Leilão</h1>
+                <p class="lead">Confira as propriedades rurais que estão sendo leiloadas e suas características detalhadas.</p>
+            </div>
+            <div class="col-md-6">
+                <img src="{% static 'pages/img/pexels-photo-5668473.jpeg' %}" alt="Bens Rurais" class="img-fluid">
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Bens Rurais -->
+    <div class="container mt-5">
+        <h2 class="h3">Bens Rurais em Leilão</h2>
+        <div class="row">
+            {% for bem_rural in bens_rurais %}
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <img src="{{ bem_rural.imagem.url }}" alt="{{ bem_rural.titulo }}" class="card-img-top">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ bem_rural.titulo }}</h5>
+                        <p class="card-text">Área: {{ bem_rural.area }} ha</p>
+                        <p class="card-text">Localização: {{ bem_rural.localizacao }}</p>
+                        <p class="card-text">Preço estimado: R$ {{ bem_rural.preco_estima|floatformat:2 }}</p>
+                        <a href="{% url 'category_rural_detail' bem_rural.id %}" class="btn btn-secondary btn-block">Ver Detalhes</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-center">Nenhum bem rural disponível no momento.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% include '_footer.html' %}
+</body>
+</html>

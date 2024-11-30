@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+{% load static %} 
+{% include '_head.html' %}
+
+<body>
+    {% include '_header.html' %}
+    
+    <div class="container mt-5">
+        <h2 class="h3">Informações do Cadastro</h2>
+        <ul class="list-group">
+            <li class="list-group-item">Nome de usuário: {{ user.username }}</li>
+            <li class="list-group-item">Nome completo: {{ user.first_name }} {{ user.last_name }}</li>
+            <li class="list-group-item">E-mail: {{ user.email }}</li>
+            <li class="list-group-item">Data de cadastro: {{ user.date_joined }}</li>
+
+            {% if user.profile %}
+            <li class="list-group-item">CPF/CNPJ: {{ user.profile.cpf_cnpj }}</li>
+            <li class="list-group-item">Telefone Celular: {{ user.profile.telefone_celular }}</li>
+            <li class="list-group-item">Telefone Comercial: {{ user.profile.telefone_comercial }}</li>
+            <li class="list-group-item">CEP: {{ user.profile.cep }}</li>
+            <li class="list-group-item">Logradouro: {{ user.profile.logradouro }}</li>
+            <li class="list-group-item">Número: {{ user.profile.numero }}</li>
+            <li class="list-group-item">Complemento: {{ user.profile.complemento }}</li>
+            <li class="list-group-item">Bairro: {{ user.profile.bairro }}</li>
+            <li class="list-group-item">Cidade: {{ user.profile.cidade }}</li>
+            <li class="list-group-item">Estado: {{ user.profile.estado }}</li>
+            <li class="list-group-item">País: {{ user.profile.pais }}</li>
+            {% endif %}
+        </ul>
+    </div>
+
+    {% include '_footer.html' %}
+</body>
+</html>

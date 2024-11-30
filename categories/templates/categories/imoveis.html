@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+{% load static %}
+
+{% include '_head.html' %}
+
+<body>
+    {% include '_header.html' %}
+    
+    <div class="container mt-5">
+        <!-- Seção de Introdução -->
+        <div class="row align-items-center main-section full-width">
+            <div class="col-md-6 text-center text-md-left mb-4 mb-md-0">
+                <span class="d-block text-secondary">Leilão de Imóveis</span>
+                <h1 class="display-4">Imóveis Disponíveis para Leilão</h1>
+                <p class="lead">Confira as propriedades que estão sendo leiloadas e suas características detalhadas.</p>
+            </div>
+            <div class="col-md-6">
+                <img src="{% static 'pages/img/pexels-photo-5668473.jpeg' %}" alt="Imóveis" class="img-fluid">
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Imóveis -->
+    <div class="container mt-5">
+        <h2 class="h3">Imóveis em Leilão</h2>
+        <div class="row">
+            {% for imovel in imoveis %}
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <img src="{{ imovel.imagem.url }}" alt="{{ imovel.titulo }}" class="card-img-top">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ imovel.titulo }}</h5>
+                        <p class="card-text">Localização: {{ imovel.localizacao }}</p>
+                        <p class="card-text">Área: {{ imovel.area }} m²</p>
+                        <p class="card-text">Preço estimado: R$ {{ imovel.preco_estima|floatformat:2 }}</p>
+                        <a href="{% url 'category_imoveis_detail' imovel.id %}" class="btn btn-secondary btn-block">Ver Detalhes</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-center">Nenhum imóvel disponível no momento.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% include '_footer.html' %}
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+{% include '_head.html' %}
+<body>
+    {% include '_header.html' %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-lg">
+                    <div class="card-body text-center">
+                        <h2 class="card-title text-success mb-4">Confirmação de E-mail</h2>
+                        <p class="card-text mb-4">
+                            Um link de confirmação foi enviado para o e-mail que você cadastrou. 
+                            Por favor, verifique sua caixa de entrada (ou a pasta de spam) e clique no link para ativar sua conta.
+                        </p>
+                        <div class="d-flex justify-content-center">
+                            <img src="{% static 'img/email_confirmation.png' %}" 
+                                 alt="Confirmação de E-mail" 
+                                 class="img-fluid" 
+                                 style="max-width: 200px;">
+                        </div>
+                        <hr class="my-4">
+                        <p class="mb-4">
+                            Não recebeu o e-mail? <br>
+                            <a href="{% url 'account_email_verification_sent' %}" class="text-decoration-none">
+                                Reenviar link de confirmação
+                            </a>
+                        </p>
+                        <a href="{% url 'home' %}" class="btn btn-primary">Voltar à Página Inicial</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% include '_footer.html' %}
+</body>
+</html>
