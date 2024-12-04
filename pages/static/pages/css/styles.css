@@ -222,3 +222,45 @@ body.signup-page {
 .signup-page .btn-block:hover {
     background-color: #5a6268;
 }
+
+.carousel {
+    position: relative;
+    max-height: 400px;
+    overflow: hidden;
+}
+
+.carousel img {
+    object-fit: cover;
+    height: 400px;
+}
+
+.custom-arrow {
+    position: absolute;
+    top: 10%; /* Posiciona os botões acima das imagens */
+    z-index: 10;
+    background: none; /* Remove o fundo padrão */
+    border: none; /* Remove bordas */
+    color: gray; /* Cor das setas */
+    font-size: 2rem; /* Tamanho das setas */
+    width: auto; /* Ajusta o tamanho */
+    height: auto; /* Ajusta o tamanho */
+    cursor: pointer; /* Adiciona cursor de interação */
+}
+
+.custom-arrow .carousel-control-prev-icon,
+.custom-arrow .carousel-control-next-icon {
+    background-color: gray; /* Cor cinza para as setas */
+    border-radius: 50%; /* Deixa as setas circulares */
+    width: 50px; /* Tamanho das setas */
+    height: 50px; /* Tamanho das setas */
+    opacity: 0.8; /* Torna um pouco translúcido */
+}
+
+.custom-arrow:hover .carousel-control-prev-icon,
+.custom-arrow:hover .carousel-control-next-icon {
+    opacity: 1; /* Destaque ao passar o mouse */
+}
+
+.form-group input[type="radio"] {
+    margin-right: 10px;
+}

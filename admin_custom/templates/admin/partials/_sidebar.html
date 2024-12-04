@@ -1,12 +1,11 @@
 {% load adminlte_helpers %}
-
 {% load static %}
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     {% include "admin/partials/_logo.html" %}
     <!-- Sidebar -->
     <div class="sidebar">
-        <!-- Sidebar user panel (optional) -->
+        <!-- Sidebar user panel -->
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
             <div class="image">
                 <img src="{% avatar_url size=90 %}" class="img-circle elevation-2" alt="User Image">
@@ -15,46 +14,151 @@
                 <a href="#" class="d-block">{{ user.username }}</a>
             </div>
         </div>
+
         <!-- Sidebar Menu -->
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                <li class="nav-header">MAIN NAVIGATION</li>
+                <!-- Navegação Principal -->
+                <li class="nav-header">Gerenciamento Gama</li>
+                
                 <li class="nav-item">
-                    <a href="{% url 'list-clients' %}" class="nav-link">Clientes</a>
-                </li>
-                <li class="nav-item">
-                    <a href="{% url 'list-auctions' %}" class="nav-link"><i class="fa fa-gavel"></i> <span>Leilões</span></a>
-                </li>
-                <li class="nav-item">
-                    <a href="{% url 'list-items' %}" class="nav-link"><i class="fa fa-cubes"></i> <span>Itens</span></a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link active">
-                        <i class="nav-icon fas fa-tachometer-alt"></i>
-                        <p>Example Link Active</p>
+                    <a href="{% url 'admin:auth_user_changelist' %}" class="nav-link">
+                        <i class="nav-icon fas fa-users"></i>
+                        <p>Clientes</p>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="{% url 'admin:auction_management_auction_changelist' %}" class="nav-link">
+                        <i class="nav-icon fas fa-gavel"></i>
+                        <p>Leilões</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'admin:categories_auctioncategory_changelist' %}" class="nav-link">
+                        <i class="nav-icon fas fa-list-alt"></i>
+                        <p>Categorias</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'admin:auction_management_baseitem_changelist' %}" class="nav-link">
+                        <i class="nav-icon fas fa-cubes"></i>
+                        <p>Itens</p>
+                    </a>
+                </li>
+                
+                <!-- Submenu Financeiro -->
                 <li class="nav-item has-treeview">
                     <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-object-group"></i>
-                        <p>Sub Menu<i class="right fas fa-angle-left"></i></p>
+                        <i class="nav-icon fas fa-money-check-alt"></i>
+                        <p>
+                            Financeiro
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
                     </a>
-                    <ul class="nav nav-treeview menu-open">
+                    <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="nav-icon fas fa-circle"></i> Link
+                            <a href="" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Lances</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link active">
-                                <i class="nav-icon fas fa-user"></i> Another Link
+                            <a href="#" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Pagamentos</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Integração</p>
                             </a>
                         </li>
                     </ul>
                 </li>
+
+                <!-- Submenu Marketing -->
+                <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-bullhorn"></i>
+                        <p>
+                            Marketing
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Banners</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Emails</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Páginas</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- Submenu Relatórios -->
+                <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-chart-pie"></i>
+                        <p>
+                            Relatórios
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Resumo</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Financeiro</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Itens</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Clientes</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- Links adicionais -->
+                <li class="nav-item">
+                    <a href="" class="nav-link">
+                        <i class="nav-icon fas fa-user"></i>
+                        <p>Usuários</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="" class="nav-link">
+                        <i class="nav-icon fas fa-cogs"></i>
+                        <p>Configurações</p>
+                    </a>
+                </li>
             </ul>
         </nav>
-        <!-- /.sidebar-menu -->
     </div>
-    <!-- /.sidebar -->
 </aside>

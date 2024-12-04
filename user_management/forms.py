@@ -1,19 +1,22 @@
+import re
+import requests
 from django import forms
+from django.core.exceptions import ValidationError
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from user_management.models import Profile
-from .models import Profile
+from user_management.models import Arrematante
 
 class CustomSignupForm(UserCreationForm):
-    username = forms.CharField(
-        max_length=150, 
-        label='Nome de Usuário', 
-        help_text='Obrigatório. 150 caracteres ou menos. Apenas letras, números e @/./+/-/_ são permitidos.'
-    )
+    TIPO_CADASTRO_CHOICES = [
+        ('PF', 'Pessoa Física'),
+        ('PJ', 'Pessoa Jurídica'),
+    ]
+
+    username = forms.CharField(max_length=150, label='Nome de Usuário')
     first_name = forms.CharField(max_length=30, label='Nome')
     last_name = forms.CharField(max_length=30, label='Sobrenome')
-    email = forms.EmailField(max_length=254, label='E-mail', help_text='Um endereço de e-mail válido.')
-    cpf_cnpj = forms.CharField(max_length=18, label='CPF/CNPJ')
+    email = forms.EmailField(max_length=254, label='E-mail')
+    cpf_cnpj = forms.CharField(max_length=30, label='CPF/CNPJ')
     cep = forms.CharField(max_length=9, label='CEP')
     logradouro = forms.CharField(max_length=255, label='Logradouro')
     numero = forms.CharField(max_length=10, label='Número')
@@ -21,18 +24,66 @@ class CustomSignupForm(UserCreationForm):
     bairro = forms.CharField(max_length=100, label='Bairro')
     cidade = forms.CharField(max_length=100, label='Cidade')
     estado = forms.CharField(max_length=50, label='Estado')
-    pais = forms.ChoiceField(choices=[ 
-        ('Brasil', 'Brasil'),
-        ('Argentina', 'Argentina'),
-        ('Chile', 'Chile'),
-        # Adicione outros países conforme necessário
-    ], initial='Brasil', label='País')
+    pais = forms.ChoiceField(choices=[('Brasil', 'Brasil')], initial='Brasil', label='País')
     telefone_comercial = forms.CharField(max_length=15, required=False, label='Telefone Comercial')
     telefone_celular = forms.CharField(max_length=15, label='Telefone Celular')
+    tipo_cadastro = forms.ChoiceField(
+        choices=TIPO_CADASTRO_CHOICES,
+        widget=forms.RadioSelect,
+        label='Tipo de Cadastro'
+    )
 
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2')
+        fields = (
+            'username', 'first_name', 'last_name', 'email', 'password1', 'password2',
+        )
+
+    def clean_cpf_cnpj(self):
+        cpf_cnpj = self.cleaned_data['cpf_cnpj'].strip().replace('.', '').replace('/', '').replace('-', '')  # Remove os caracteres especiais
+        
+        cpf_pattern = r'^\d{11}$'  # Apenas números, 11 dígitos para CPF
+        cnpj_pattern = r'^\d{14}$'  # Apenas números, 14 dígitos para CNPJ
+
+        if not re.match(cpf_pattern, cpf_cnpj) and not re.match(cnpj_pattern, cpf_cnpj):
+            raise ValidationError("CPF ou CNPJ inválido. Use os formatos: 000.000.000-00 para CPF e 00.000.000/0000-00 para CNPJ.")
+        
+        return self.cleaned_data['cpf_cnpj']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        cpf_cnpj = cleaned_data.get('cpf_cnpj')
+        tipo_cadastro = cleaned_data.get('tipo_cadastro')
+
+        cpf_pattern = r'^\d{11}$'
+        cnpj_pattern = r'^\d{14}$'
+
+        if tipo_cadastro == 'PF' and not re.match(cpf_pattern, cpf_cnpj.replace('.', '').replace('-', '').replace('/', '')):
+            raise ValidationError("Para Pessoas Físicas, insira um CPF válido.")
+        if tipo_cadastro == 'PJ' and not re.match(cnpj_pattern, cpf_cnpj.replace('.', '').replace('-', '').replace('/', '')):
+            raise ValidationError("Para Pessoas Jurídicas, insira um CNPJ válido.")
+        
+        return cleaned_data
+
+
+    def clean_cep(self):
+        cep = self.cleaned_data['cep'].strip()
+        if not re.match(r'^\d{5}-\d{3}$', cep):
+            raise ValidationError("CEP inválido. Use o formato 00000-000.")
+
+        # Consulta API ViaCEP para preencher o endereço automaticamente
+        response = requests.get(f'https://viacep.com.br/ws/{cep}/json/')
+        if response.status_code == 200:
+            data = response.json()
+            if 'erro' in data:
+                raise ValidationError("CEP não encontrado.")
+            self.cleaned_data['logradouro'] = data.get('logradouro', '')
+            self.cleaned_data['bairro'] = data.get('bairro', '')
+            self.cleaned_data['cidade'] = data.get('localidade', '')
+            self.cleaned_data['estado'] = data.get('uf', '')
+        else:
+            raise ValidationError("Não foi possível validar o CEP.")
+        return cep
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -45,40 +96,51 @@ class CustomSignupForm(UserCreationForm):
         return user
 
     def signup(self, request, user):
-        """
-        Método necessário para o Django Allauth funcionar corretamente com um formulário personalizado de inscrição.
-        Aqui você pode adicionar a lógica para criar ou atualizar o perfil do usuário.
-        """
-        # Salvar informações do usuário
-        user.username = self.cleaned_data['username']
         user.first_name = self.cleaned_data['first_name']
         user.last_name = self.cleaned_data['last_name']
         user.email = self.cleaned_data['email']
         user.save()
 
-        # Criar ou atualizar o perfil
-        profile, created = Profile.objects.get_or_create(user=user)
-        
-        if created:  # Se o perfil foi criado, preenche os dados
-            profile.cpf_cnpj = self.cleaned_data['cpf_cnpj']
-            profile.cep = self.cleaned_data['cep']
-            profile.logradouro = self.cleaned_data['logradouro']
-            profile.numero = self.cleaned_data['numero']
-            profile.complemento = self.cleaned_data['complemento']
-            profile.bairro = self.cleaned_data['bairro']
-            profile.cidade = self.cleaned_data['cidade']
-            profile.estado = self.cleaned_data['estado']
-            profile.pais = self.cleaned_data['pais']
-            profile.telefone_comercial = self.cleaned_data['telefone_comercial']
-            profile.telefone_celular = self.cleaned_data['telefone_celular']
-            profile.save()
-
+        arrematante = Arrematante.objects.create(
+            user=user,
+            cpf_cnpj=self.cleaned_data['cpf_cnpj'],
+            cep=self.cleaned_data['cep'],
+            logradouro=self.cleaned_data['logradouro'],
+            numero=self.cleaned_data['numero'],
+            complemento=self.cleaned_data['complemento'],
+            bairro=self.cleaned_data['bairro'],
+            cidade=self.cleaned_data['cidade'],
+            estado=self.cleaned_data['estado'],
+            pais=self.cleaned_data['pais'],
+            telefone_comercial=self.cleaned_data['telefone_comercial'],
+            telefone_celular=self.cleaned_data['telefone_celular'],
+            tipo_cadastro=self.cleaned_data['tipo_cadastro']
+        )
         return user
 
-class ProfileEditForm(forms.ModelForm):
+class ArrematanteEditForm(forms.ModelForm):
     class Meta:
-        model = Profile
-        fields = ['telefone_celular', 'cep', 'logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'estado', 'pais']
+        model = Arrematante
+        fields = [
+            'tipo_cadastro',  
+            'cpf_cnpj',
+            'cep',
+            'logradouro',
+            'numero',
+            'complemento',
+            'bairro',
+            'cidade',
+            'estado',
+            'pais',
+            'telefone_comercial',
+            'telefone_celular',
+        ]
+
+    tipo_cadastro = forms.ChoiceField(
+        choices=Arrematante.TIPO_CADASTRO_CHOICES,
+        widget=forms.RadioSelect,  
+        label="Tipo de Cadastro",
+    )
 
 
 class UserEditForm(forms.ModelForm):

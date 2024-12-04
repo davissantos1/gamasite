@@ -21,10 +21,8 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', include('admin_custom.urls')),
     path('', include('pages.urls')),  # URLs para o site do cliente
-    path('auction_management/', include('auction_management.urls')),
     path('categories/', include('categories.urls')),
     #path('reviews/', include('reviews_ratings.urls')),
     path('accounts/', include('user_management.urls')),
     path('accounts/', include('allauth.urls')),
-
 ]

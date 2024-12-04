@@ -41,8 +41,8 @@
         <div class="col-lg-3 col-xs-6">
             <div class="small-box bg-yellow">
                 <div class="inner">
-                    <h3>{{ categories_count }}</h3>
-                    <p>Categorias</p>
+                    <h3>{{ items_count }}</h3>
+                    <p>Itens Cadastrados</p>
                 </div>
                 <div class="icon">
                     <i class="fa fa-tags"></i>
@@ -58,6 +58,22 @@
                 </div>
                 <div class="icon">
                     <i class="fa fa-bell"></i>
+                </div>
+                <a href="" class="small-box-footer">Mais info <i class="fa fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção do Valor Avaliado dos Itens -->
+    <div class="row">
+        <div class="col-lg-12 col-xs-12">
+            <div class="small-box bg-light-blue">
+                <div class="inner">
+                    <h3>R$ {{ total_valor_avaliado|floatformat:2 }}</h3>
+                    <p>Valor Avaliado dos Itens</p>
+                </div>
+                <div class="icon">
+                    <i class="fa fa-money"></i>
                 </div>
                 <a href="" class="small-box-footer">Mais info <i class="fa fa-arrow-circle-right"></i></a>
             </div>

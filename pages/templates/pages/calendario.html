@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+{% load static %}
+{% include '_head.html' %}
+<body>
+    {% include '_header.html' %}
+
+    <!-- Seção de Introdução -->
+    <div class="container mt-5 text-center">
+        <h1 class="display-4">Calendário de Leilões</h1>
+        <p class="lead">Veja os leilões programados para este mês e clique para saber mais!</p>
+    </div>
+
+    <!-- Calendário de Leilões -->
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="table-responsive">
+                    <table class="table table-bordered text-center">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Dom</th>
+                                <th>Seg</th>
+                                <th>Ter</th>
+                                <th>Qua</th>
+                                <th>Qui</th>
+                                <th>Sex</th>
+                                <th>Sáb</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for week in calendar %}
+                                <tr>
+                                    {% for day in week %}
+                                        <td>
+                                            {% if day %}
+                                                <span class="font-weight-bold">{{ day.day }}</span>
+                                                <ul class="list-unstyled mt-2">
+                                                    {% for auction in day.auctions %}
+                                                        <li>
+                                                            <a href="{% url 'leilao_detalhe' auction.id %}">
+                                                                {{ auction.lote }} - {{ auction.date_time|time:"H:i" }}
+                                                            </a>
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include '_footer.html' %}
+</body>
+</html>

@@ -26,37 +26,36 @@
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav2" aria-controls="navbarNav2" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarNav2">
+    <div class="collapse navbar-collapse" id="navbarNav2"> 
         <ul class="navbar-nav mx-auto">
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'pages:home' %}" style="transition: color 0.3s; color:#fff;">Página Inicial</a>
             </li>
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="leiloesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="transition: color 0.3s;color:#fff;">
-                    Leilões
-                </a>
-                <div class="dropdown-menu" aria-labelledby="leiloesDropdown">
-                    <a class="dropdown-item" href="#">Leilões Ao Vivo</a>
-                    <a class="dropdown-item" href="#">Calendário</a>
-                </div>
-            </li>
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="categoriasDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="transition: color 0.3s;color:#fff;">
-                    Categorias
-                </a>
-                <div class="dropdown-menu" aria-labelledby="categoriasDropdown">
-                    <a class="dropdown-item" href="{% url 'categories:imoveis' %}">Imóveis</a>
-                    <a class="dropdown-item" href="{% url 'categories:veiculos' %}">Veículos</a>
-                    <a class="dropdown-item" href="{% url 'categories:rural' %}">Rural</a>
-                    <a class="dropdown-item" href="{% url 'categories:outros_bens' %}">Outros Bens</a>
-                </div>
+            <li class="nav-item">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="leiloesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="transition: color 0.3s;color:#fff;">
+                        Leilões
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="leiloesDropdown">
+                        <a class="dropdown-item" href="{% url 'pages:leiloes_ao_vivo' %}">Leilões Ao Vivo</a>
+                        <a class="dropdown-item" href="{% url 'pages:calendario' %}">Calendário</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'pages:como_participar' %}" style="transition: color 0.3s;color:#fff;">Como Participar</a>
+                </li>
+                <a class="nav-link" href="{% url 'categories:imoveis' %}" style="transition: color 0.3s; color:#fff;">Imóveis</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#" style="transition: color 0.3s;color:#fff;">Contato</a>
+                <a class="nav-link" href="{% url 'categories:veiculos' %}" style="transition: color 0.3s; color:#fff;">Veículos</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'pages:como_participar' %}" style="transition: color 0.3s;color:#fff;">Como Participar</a>
+                <a class="nav-link" href="{% url 'categories:rural' %}" style="transition: color 0.3s; color:#fff;">Rural</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'categories:outros_bens' %}" style="transition: color 0.3s; color:#fff;">Outros Bens</a>
+            </li>
+           
         </ul>
     </div>
 </nav>

@@ -10,5 +10,5 @@ urlpatterns = [
     path('auctions/', list_auctions, name='list-auctions'),
     path('itens/', list_items, name='list-items'),
     path('', admin_dashboard, name='admin-dashboard'),  # Dashboard personalizado como página inicial
-    path('default/', admin.site.urls),  # URLs padrão do admin
+    path('', admin.site.urls),  # URLs padrão do admin
 ]

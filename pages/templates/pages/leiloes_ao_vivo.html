@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+{% load static %}
+{% include '_head.html' %}
+<body>
+    {% include '_header.html' %}
+
+    <!-- Como Participar dos Leilões -->
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">Como Participar dos Leilões Ao Vivo</h2>
+        <div class="row">
+            <div class="col-md-6">
+                <p class="lead">Participar dos nossos leilões ao vivo é simples e seguro. <br><br>Siga os passos abaixo para arrematar itens exclusivos:</p>
+                <ul>
+                    <li><strong>1. Cadastre-se:</strong> Crie uma conta no nosso site para começar.</li>
+                    <li><strong>2. Navegue pelos Leilões:</strong> Acesse os leilões ao vivo e escolha os itens de seu interesse.</li>
+                    <li><strong>3. Faça suas Propostas:</strong> Envie lances ao vivo e acompanhe os leilões em tempo real.</li>
+                    <li><strong>4. Arremate o Item:</strong> Caso sua oferta seja a vencedora, finalize o pagamento e receba seu item.</li>
+                </ul>
+                <p class="lead">Dúvidas? Entre em contato com nossa equipe de suporte!</p>
+            </div>
+            <div class="col-md-6">
+                <img src="{% static 'pages/img/how-to-participate.png' %}" alt="Como Participar" class="img-fluid">
+            </div>
+        </div>
+    </div>
+
+    <!-- Leilões Ao Vivo -->
+    <div class="central-section">
+        <div class="container">
+            <h2 class="text-center mb-4">Leilões Ao Vivo</h2>
+            {% if auctions %}
+                <div class="row">
+                    {% for auction in auctions %}
+                        {% if auction.is_live %}
+                            <div class="col-md-4 mb-4">
+                                <div class="card">
+                                    <img src="{{ auction.image.url }}" class="card-img-top" alt="{{ auction.lote }}">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Lote {{ auction.lote }}</h5>
+                                        <p class="card-text">{{ auction.descricao|truncatewords:15 }}</p>
+                                        <p class="text-muted">Data e Hora: {{ auction.date_time|date:"d/m/Y H:i" }}</p>
+                                        <a href="{% url 'leilao_detalhe' auction.id %}" class="btn btn-outline-secondary btn-block">
+                                            Ver Detalhes
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-center text-muted">Nenhum leilão ao vivo no momento. Confira mais tarde!</p>
+            {% endif %}
+        </div>
+    </div>
+
+    {% include '_footer.html' %}
+</body>
+</html>

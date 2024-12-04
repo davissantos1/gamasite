@@ -1,3 +1,6 @@
 from django.contrib import admin
+from .models import AuctionCategory
 
-# Register your models here.
+@admin.register(AuctionCategory)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('id', 'nome', 'descricao')

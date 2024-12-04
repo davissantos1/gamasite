@@ -4,6 +4,44 @@
 {% include '_head.html' %}
 <body>
     {% include '_header.html' %}
+
+<!-- Carrossel de Banners -->
+<div id="mainCarousel" class="carousel slide mb-5" data-bs-ride="carousel" data-bs-interval="5000" style="max-height: 400px; overflow: hidden;">
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <img src="{% static 'pages/img/banner1.jpg' %}" class="d-block w-100" alt="Primeiro Banner" style="object-fit: cover;">
+            <div class="carousel-caption d-none d-md-block">
+                <h5>Bem-vindo aos Leilões Inovadores</h5>
+                <p>Descubra oportunidades únicas em nosso marketplace.</p>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <img src="{% static 'pages/img/banner2.jpg' %}" class="d-block w-100" alt="Segundo Banner" style="object-fit: cover;">
+            <div class="carousel-caption d-none d-md-block">
+                <h5>Leilões Exclusivos</h5>
+                <p>Arte, antiguidades e muito mais em um só lugar.</p>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <img src="{% static 'pages/img/banner3.jpg' %}" class="d-block w-100" alt="Terceiro Banner" style="object-fit: cover;">
+            <div class="carousel-caption d-none d-md-block">
+                <h5>Participe Agora</h5>
+                <p>Não perca os leilões ao vivo mais emocionantes.</p>
+            </div>
+        </div>
+    </div>
+    <!-- Botões de Navegação -->
+    <button class="carousel-control-prev custom-arrow" type="button" data-bs-target="#mainCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    </button>
+    <button class="carousel-control-next custom-arrow" type="button" data-bs-target="#mainCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    </button>
+</div>
+
+
+
+
     <div class="container mt-5">
         <!-- Seção de Introdução -->
         <div class="row align-items-center main-section full-width">
@@ -19,43 +57,40 @@
         </div>
     </div>
 
-    <!-- Nova Seção Central -->
+    <!-- Itens em Destaque por Categoria -->
     <div class="central-section">
         <div class="container">
+            <h2 class="text-center mb-4">Itens em Destaque</h2>
             <div class="row">
-                <div class="col-md-4">
-                    <div class="card">
-                        <img src="{% static 'pages/img/pexels-photo-5668473.jpeg' %}" class="card-img-top" alt="Imagem 1">
-                        <div class="card-body">
-                            <h5 class="card-title">Leilão de Obras de Arte</h5>
-                            <p class="card-text">Encontre pinturas, esculturas e outras obras de arte únicas.</p>
-                            <a href="#" class="btn btn-outline-secondary">Ver Mais</a>
+                {% for category in categories %}
+                    <div class="col-md-4">
+                        <h3>{{ category.name }}</h3>
+                        <div class="card">
+                            <img src="{{ category.featured_item.image.url }}" class="card-img-top" alt="{{ category.featured_item.name }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ category.featured_item.name }}</h5>
+                                <p class="card-text">{{ category.featured_item.description }}</p>
+
+                                {% if category.featured_item %}
+                                <a href="{% url 'auction_management:item_detail' category.featured_item.id %}" class="btn btn-outline-secondary">
+                                    Ver Mais
+                                </a>
+                                {% else %}
+                                <a class="btn btn-outline-secondary disabled">
+                                    Não disponível
+                                </a>
+                                {% endif %}
+
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card">
-                        <img src="{% static 'pages/img/pexels-photo-5668802.jpeg' %}" class="card-img-top" alt="Imagem 2">
-                        <div class="card-body">
-                            <h5 class="card-title">Leilão de Antiguidades</h5>
-                            <p class="card-text">Descubra peças históricas e raridades de valor inestimável.</p>
-                            <a href="#" class="btn btn-outline-secondary">Ver Mais</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card">
-                        <img src="{% static 'pages/img/pexels-photo-5668474.jpeg' %}" class="card-img-top" alt="Imagem 3">
-                        <div class="card-body">
-                            <h5 class="card-title">Leilão de Veículos</h5>
-                            <p class="card-text">Encontre veículos clássicos e modernos em ótimas condições.</p>
-                            <a href="#" class="btn btn-outline-secondary">Ver Mais</a>
-                        </div>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
+
+    
+
 
     {% include '_footer.html' %}
 </body>
