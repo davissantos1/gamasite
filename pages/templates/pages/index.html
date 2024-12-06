@@ -39,9 +39,6 @@
     </button>
 </div>
 
-
-
-
     <div class="container mt-5">
         <!-- Seção de Introdução -->
         <div class="row align-items-center main-section full-width">
@@ -61,36 +58,135 @@
     <div class="central-section">
         <div class="container">
             <h2 class="text-center mb-4">Itens em Destaque</h2>
-            <div class="row">
-                {% for category in categories %}
-                    <div class="col-md-4">
-                        <h3>{{ category.name }}</h3>
-                        <div class="card">
-                            <img src="{{ category.featured_item.image.url }}" class="card-img-top" alt="{{ category.featured_item.name }}">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ category.featured_item.name }}</h5>
-                                <p class="card-text">{{ category.featured_item.description }}</p>
 
-                                {% if category.featured_item %}
-                                <a href="{% url 'auction_management:item_detail' category.featured_item.id %}" class="btn btn-outline-secondary">
-                                    Ver Mais
-                                </a>
-                                {% else %}
-                                <a class="btn btn-outline-secondary disabled">
-                                    Não disponível
-                                </a>
-                                {% endif %}
-
+            <!-- Seção de Imóveis -->
+            <div class="row mb-5">
+                <div class="col-md-12">
+                    <h3 class="text-center mb-4">Imóveis</h3>
+                    <div class="row">
+                        <!-- Item 1 -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card">
+                                <img src="{% static 'pages/img/imoveis-destaque1.jpg' %}" class="card-img-top" alt="Imóvel 1" style="object-fit: cover; height: 200px;">
+                                <div class="card-body">
+                                    <h5 class="card-title">Casa de Luxo</h5>
+                                    <p class="card-text">Uma casa moderna e espaçosa no coração da cidade.</p>
+                                    <a href="#" class="btn btn-outline-secondary">Ver Mais</a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Item 2 -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card">
+                                <img src="{% static 'pages/img/imoveis-destaque2.jpg' %}" class="card-img-top" alt="Imóvel 2" style="object-fit: cover; height: 200px;">
+                                <div class="card-body">
+                                    <h5 class="card-title">Apartamento Moderno</h5>
+                                    <p class="card-text">Conforto e sofisticação em um local privilegiado.</p>
+                                    <a href="#" class="btn btn-outline-secondary">Ver Mais</a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Item 3 -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card">
+                                <img src="{% static 'pages/img/imoveis-destaque3.jpg' %}" class="card-img-top" alt="Imóvel 3" style="object-fit: cover; height: 200px;">
+                                <div class="card-body">
+                                    <h5 class="card-title">Terreno Comercial</h5>
+                                    <p class="card-text">Excelente localização para seu novo negócio.</p>
+                                    <a href="#" class="btn btn-outline-secondary">Ver Mais</a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                {% endfor %}
+                </div>
             </div>
+
+            <!-- Seção de Veículos -->
+            <div class="row mb-5">
+                <div class="col-md-12">
+                    <h3 class="text-center mb-4">Veículos</h3>
+                    <div class="row">
+                        <!-- Item 1 -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card">
+                                <img src="{% static 'pages/img/veiculos-destaque1.jpg' %}" class="card-img-top" alt="Veículo 1" style="object-fit: cover; height: 200px;">
+                                <div class="card-body">
+                                    <h5 class="card-title">Carro Esportivo</h5>
+                                    <p class="card-text">Velocidade e design sofisticado em um único carro.</p>
+                                    <a href="#" class="btn btn-outline-secondary">Ver Mais</a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Item 2 -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card">
+                                <img src="{% static 'pages/img/veiculos-destaque2.jpg' %}" class="card-img-top" alt="Veículo 2" style="object-fit: cover; height: 200px;">
+                                <div class="card-body">
+                                    <h5 class="card-title">SUV 4x4</h5>
+                                    <p class="card-text">Conforto e potência para todas as estradas.</p>
+                                    <a href="#" class="btn btn-outline-secondary">Ver Mais</a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Item 3 -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card">
+                                <img src="{% static 'pages/img/veiculos-destaque3.jpg' %}" class="card-img-top" alt="Veículo 3" style="object-fit: cover; height: 200px;">
+                                <div class="card-body">
+                                    <h5 class="card-title">Motos Clássicas</h5>
+                                    <p class="card-text">Para os amantes da velocidade e estilo retro.</p>
+                                    <a href="#" class="btn btn-outline-secondary">Ver Mais</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção Rural -->
+            <div class="row mb-5">
+                <div class="col-md-12">
+                    <h3 class="text-center mb-4">Rural</h3>
+                    <div class="row">
+                        <!-- Item 1 -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card">
+                                <img src="{% static 'pages/img/rural-destaque1.jpg' %}" class="card-img-top" alt="Rural 1" style="object-fit: cover; height: 200px;">
+                                <div class="card-body">
+                                    <h5 class="card-title">Propriedade Agrícola</h5>
+                                    <p class="card-text">Terreno fértil com grande potencial para cultivo.</p>
+                                    <a href="#" class="btn btn-outline-secondary">Ver Mais</a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Item 2 -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card">
+                                <img src="{% static 'pages/img/rural-destaque2.jpg' %}" class="card-img-top" alt="Rural 2" style="object-fit: cover; height: 200px;">
+                                <div class="card-body">
+                                    <h5 class="card-title">Fazenda de Pecuária</h5>
+                                    <p class="card-text">Área extensa e com infraestrutura completa para criação de gado.</p>
+                                    <a href="#" class="btn btn-outline-secondary">Ver Mais</a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Item 3 -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card">
+                                <img src="{% static 'pages/img/rural-destaque3.jpg' %}" class="card-img-top" alt="Rural 3" style="object-fit: cover; height: 200px;">
+                                <div class="card-body">
+                                    <h5 class="card-title">Chácara de Lazer</h5>
+                                    <p class="card-text">O local perfeito para lazer e contato com a natureza.</p>
+                                    <a href="#" class="btn btn-outline-secondary">Ver Mais</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
-
-    
-
 
     {% include '_footer.html' %}
 </body>

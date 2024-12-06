@@ -1,0 +1,20 @@
+# Força arquivos de texto a usar LF
+* text=auto
+
+# Especifica arquivos que devem sempre usar LF
+*.sh    text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.json  text eol=lf
+*.html  text eol=lf
+*.css   text eol=lf
+*.js    text eol=lf
+*.py    text eol=lf
+
+# Especifica arquivos binários que não devem ser convertidos
+*.jpg   -text
+*.png   -text
+*.gif   -text
+*.ico   -text
+*.pdf   -text
+*.exe   -text

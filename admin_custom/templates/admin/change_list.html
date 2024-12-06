@@ -1,0 +1,107 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_list %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'admin/css/changelists.css' %}">
+  {% if cl.formset %}
+    <link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">
+  {% endif %}
+  {{ media.css }}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <!-- Título da Página -->
+  <div class="row">
+    <div class="col-md-8">
+      <h1 class="display-6 text-primary">
+        {{ cl.opts.verbose_name_plural|capfirst }}
+      </h1>
+      <p class="text-muted">
+        Gerencie os itens cadastrados em <strong>{{ cl.opts.app_label }}</strong>.
+      </p>
+    </div>
+    <div class="col-md-4 text-end">
+      {% block object-tools %}
+      <div class="btn-group">
+        {% block object-tools-items %}
+        {% change_list_object_tools %}
+        {% endblock %}
+      </div>
+      {% endblock %}
+    </div>
+  </div>
+
+  <!-- Filtros e Pesquisa -->
+  <div class="row mb-4">
+    <div class="col-md-8 d-flex gap-3">
+      {% block filters %}
+      {% if cl.has_filters %}
+      <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+          {% translate 'Filtrar por:' %}
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+          {% for spec in cl.filter_specs %}
+            <li class="dropdown-item">{% admin_list_filter cl spec %}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% if cl.has_active_filters %}
+        <a href="{{ cl.clear_all_filters_qs }}" class="btn btn-sm btn-danger">
+          {% translate "Limpar filtros" %}
+        </a>
+      {% endif %}
+      {% endif %}
+      {% endblock %}
+    </div>
+    <div class="col-md-4">
+      {% block search %}
+      <form method="get" class="d-flex">
+        <input type="text" name="q" value="{{ cl.query }}" class="form-control" placeholder="{% translate 'Pesquisar...' %}">
+        <button class="btn btn-primary ms-2" type="submit">{% translate 'Buscar' %}</button>
+      </form>
+      {% endblock %}
+    </div>
+  </div>
+
+  <!-- Lista de Resultados -->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <form id="changelist-form" method="post" novalidate>
+            {% csrf_token %}
+            {% if cl.formset %}
+            <div>{{ cl.formset.management_form }}</div>
+            {% endif %}
+
+            {% block result_list %}
+            {% if action_form and actions_on_top and cl.show_admin_actions %}
+              {% admin_actions %}
+            {% endif %}
+            {% result_list cl %}
+            {% if action_form and actions_on_bottom and cl.show_admin_actions %}
+              {% admin_actions %}
+            {% endif %}
+            {% endblock %}
+
+            {% block pagination %}
+            <div class="d-flex justify-content-between mt-4">
+              {% pagination cl %}
+            </div>
+            {% endblock %}
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+  {{ block.super }}
+  <!-- Colocando o script do Bootstrap diretamente no final do template -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

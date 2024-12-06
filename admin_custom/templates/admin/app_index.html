@@ -1,0 +1,49 @@
+{% extends "admin/index.html" %}
+{% load i18n %}
+
+{% block bodyclass %}{{ block.super }} app-{{ app_label }}{% endblock %}
+
+{% if not is_popup %}
+{% block nav-breadcrumbs %}
+  <nav aria-label="{% translate 'Breadcrumbs' %}" class="breadcrumb-container bg-light p-3 mb-3 rounded">
+    <div class="breadcrumbs">
+      <a href="{% url 'admin:index' %}" class="breadcrumb-link text-decoration-none">
+        <i class="fas fa-home"></i> {% translate 'Home' %}
+      </a>
+      <span class="breadcrumb-separator">›</span>
+      <span class="breadcrumb-current text-secondary">
+        {{ app_list.0.name }}
+      </span>
+    </div>
+  </nav>
+{% endblock %}
+{% endif %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="app-list bg-white p-4 rounded shadow-sm">
+        <h1 class="app-title text-primary">
+          {% translate app_list.0.name %}
+        </h1>
+        <p class="text-muted">
+          {% translate "Manage the models and settings for this app." %}
+        </p>
+        <ul class="list-group">
+          {% for model in app_list.0.models %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <a href="{{ model.admin_url }}" class="model-link text-decoration-none">
+                <i class="fas fa-cogs text-secondary"></i> {{ model.name }}
+              </a>
+              <a href="{{ model.admin_url }}" class="badge bg-primary text-white text-decoration-none">
+                {% translate "Manage" %}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,105 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block extrahead %}
+{{ block.super }}
+<script src="{% url 'admin:jsi18n' %}"></script>
+{{ media }}
+{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static "admin/css/forms.css" %}">
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<link href="{% static 'css/custom_admin_styles.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block coltype %}col-md-8{% endblock %}
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} change-form{% endblock %}
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+  &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+  &rsaquo; {% if has_view_permission %}<a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %}
+  &rsaquo; {% if add %}{% blocktranslate with name=opts.verbose_name %}Add {{ name }}{% endblocktranslate %}{% else %}{{ original|truncatewords:"18" }}{% endif %}
+</div>
+{% endblock %}
+{% endif %}
+
+{% block content %}
+<div id="content-main">
+  {% block object-tools %}
+    {% if change and not is_popup %}
+    <ul class="object-tools">
+      {% block object-tools-items %}
+        {% change_form_object_tools %}
+      {% endblock %}
+    </ul>
+    {% endif %}
+  {% endblock %}
+  
+  <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}{% if form_url %}action="{{ form_url }}" {% endif %}method="post" id="{{ opts.model_name }}_form" novalidate>
+    {% csrf_token %}
+    
+    <div class="container">
+      {% if errors %}
+      <div class="alert alert-danger">
+        <ul>
+          {% for error in errors %}
+          <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+      
+      {% block form_top %}{% endblock %}
+      
+      <!-- Seção de Informações Pessoais -->
+      <div class="section">
+        <h3>Informações</h3>
+        {% for fieldset in adminform %}
+          {% if fieldset.name != 'Último Login' and fieldset.name != 'Data de Entrada' %}
+            <div class="row mb-3">
+              <div class="col-md-12">
+                {% include "admin/includes/fieldset.html" with heading_level=2 prefix="fieldset" id_prefix=0 id_suffix=forloop.counter0 %}
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+      
+      {% block after_field_sets %}{% endblock %}
+      
+      {% block inline_field_sets %}
+        {% for inline_admin_formset in inline_admin_formsets %}
+          {% include inline_admin_formset.opts.template %}
+        {% endfor %}
+      {% endblock %}
+      
+      {% block after_related_objects %}{% endblock %}
+      
+      {% block submit_buttons_bottom %}
+        <div class="form-group text-center">
+          <button type="submit" class="btn btn-primary btn-sm">{% if add %}Add{% else %}Save{% endif %}</button>
+          <a href="{% url 'admin:app_list' app_label=opts.app_label %}" class="btn btn-secondary btn-sm ml-2">Voltar</a>
+        </div>
+      {% endblock %}
+    </div>
+
+    {% block admin_change_form_document_ready %}
+    <script id="django-admin-form-add-constants"
+            src="{% static 'admin/js/change_form.js' %}"
+            {% if adminform and add %}
+                data-model-name="{{ opts.model_name }}"
+            {% endif %}
+            async>
+    </script>
+    {% endblock %}
+
+    {% prepopulated_fields_js %}
+  </form>
+</div>
+{% endblock %}

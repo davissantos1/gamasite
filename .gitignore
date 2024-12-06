@@ -30,3 +30,8 @@ node_modules/
 # Ignore coverage reports
 coverage/
 .coverage
+
+# Ignore HTTPS certificates
+*.crt
+*.key
+*.pem

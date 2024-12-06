@@ -1,19 +1,32 @@
 from django.db import models
-from django.utils import timezone
 from django.utils.timezone import now
-from django.conf import settings  # Para associar ao modelo de usuário
-import uuid  
+from django.conf import settings
+from datetime import timedelta
+import uuid
+from categories.models import AuctionCategory
 
 def default_auction_time():
     """Retorna a data e hora atual."""
     return now()
 
+def generate_auction_code(auction):
+    """Gera o código de leilão com base no nome do leilão e números aleatórios."""
+    return f"{auction.descricao.replace(' ', '_').upper()}_{uuid.uuid4().hex[:8].upper()}"
+
+def generate_item_code(item):
+    """Gera o código do item com base no nome do item e números aleatórios."""
+    return f"{item.nome.replace(' ', '_').upper()}_{uuid.uuid4().hex[:8].upper()}"
+
 class Auction(models.Model):
-    lote = models.CharField(max_length=50, verbose_name="Lote")
-    codigo_leilao = models.CharField(max_length=50, verbose_name="Código do Leilão")
+    codigo_leilao = models.CharField(
+        max_length=50,
+        primary_key=True,  # Torna 'codigo_leilao' a chave primária
+        verbose_name="Código do Leilão",
+        unique=True
+    )
     descricao = models.TextField(verbose_name="Descrição do Leilão")
     categoria = models.ForeignKey(
-        'categories.AuctionCategory',
+        AuctionCategory,
         on_delete=models.CASCADE,
         verbose_name="Categoria"
     )
@@ -22,11 +35,15 @@ class Auction(models.Model):
     active = models.BooleanField(default=True, verbose_name="Ativo")
     date_time = models.DateTimeField(
         verbose_name="Data e Hora do Leilão",
-        default=default_auction_time
+        default=now
     )
     duration_hours = models.PositiveIntegerField(
         default=2,
         verbose_name="Duração do Leilão (em horas)"
+    )
+    quantidade_lotes = models.PositiveIntegerField(
+        default=0,
+        verbose_name="Quantidade de Lotes"
     )
 
     def is_live(self):
@@ -36,55 +53,93 @@ class Auction(models.Model):
         return start <= now() <= end and self.active
 
     def save(self, *args, **kwargs):
-        # Atualiza automaticamente o status ativo
+        if not self.codigo_leilao:  # Gera o código do leilão se não existir
+            self.codigo_leilao = generate_auction_code(self)
         if self.date_time + timedelta(hours=self.duration_hours) < now():
             self.active = False
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Lote {self.lote} - Código {self.codigo_leilao}"
-
+        return f"Leilão {self.codigo_leilao}"
 
 class BaseItem(models.Model):
     nome = models.CharField(
-        max_length=255, 
-        verbose_name="Nome", 
-        default="Item"  
+        max_length=255,
+        verbose_name="Nome",
+        default="Item"
     )
-    descricao = models.TextField()
+    descricao = models.TextField(verbose_name="Descrição", default="sem descrição")
     valor_avaliado = models.DecimalField(
-        max_digits=10, 
-        decimal_places=2, 
-        verbose_name="Valor Avaliado", 
-        default=0.00  # Adiciona valor padrão de 0
+        max_digits=10,
+        decimal_places=2,
+        verbose_name="Valor Avaliado",
+        default=0.00
     )
     codigo_item = models.CharField(
-        max_length=10,  # Ajuste o tamanho conforme necessário
-        unique=True,
+        max_length=50,  # Maior tamanho devido ao código gerado
+        primary_key=True,  # Torna 'codigo_item' a chave primária
         verbose_name="Código do Item",
-        default="",  # Será definido no `save` se vazio
+    )
+    leilao = models.ForeignKey(
+        'Auction',
+        on_delete=models.CASCADE,
+        related_name='itens',
+        verbose_name='Leilão',
+        null=True,
         blank=True
     )
+    tipo_item = models.ForeignKey(
+        'auction_management.ItemType',
+        on_delete=models.CASCADE,
+        verbose_name="Tipo do Item",
+        null=True,
+        blank=True
+    )
+
+    def save(self, *args, **kwargs):
+        # Gera o código do item se não existir
+        if not self.codigo_item:
+            self.codigo_item = generate_item_code(self)
+        
+        # Associar automaticamente o tipo de item com base na categoria do leilão
+        if self.leilao:
+            if not self.tipo_item:
+                if self.leilao.categoria.nome == 'Imóvel':
+                    self.tipo_item = ItemType.objects.get(nome='Imóvel')
+                elif self.leilao.categoria.nome == 'Veículo':
+                    self.tipo_item = ItemType.objects.get(nome='Veículo')
+                elif self.leilao.categoria.nome == 'Rural':
+                    self.tipo_item = ItemType.objects.get(nome='Rural')
+                elif self.leilao.categoria.nome == 'Outros Bens':
+                    self.tipo_item = ItemType.objects.get(nome='Outros Bens')
+                elif self.leilao.categoria.nome == 'Sem categoria':
+                    self.tipo_item = ItemType.objects.get(nome='Sem categoria')
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.nome} ({self.codigo_item})"
 
-    def save(self, *args, **kwargs):
-        if not self.codigo_item:  # Gera um código se estiver vazio
-            self.codigo_item = f"ITEM-{uuid.uuid4().hex[:6].upper()}"
-        super().save(*args, **kwargs)
+    class Meta:
+        abstract = True  # Este modelo permanece abstrato
+
+class ItemType(models.Model):
+    nome = models.CharField(max_length=100, verbose_name="Nome do Tipo de Item", unique=True)
+    descricao = models.TextField(verbose_name="Descrição", blank=True, null=True)
+
+    def __str__(self):
+        return self.nome
 
     class Meta:
-        abstract = False
-
-
+        verbose_name = "Tipo de Item"
+        verbose_name_plural = "Tipos de Itens"
 
 class Bid(models.Model):
     item = models.ForeignKey(
-        BaseItem,
+        'auction_management.RuralItem',  # Substituir por uma subclasse concreta de BaseItem
         on_delete=models.CASCADE,
-        related_name="bids",
-        verbose_name="Item do Leilão"
+        related_name='bids',
+        verbose_name='Item'
     )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -103,32 +158,29 @@ class Bid(models.Model):
     class Meta:
         verbose_name = "Lance"
         verbose_name_plural = "Lances"
-        ordering = ["-timestamp"]  # Ordena por data, mais recente primeiro
+        ordering = ["-timestamp"]
 
     def __str__(self):
         return f"Lance de {self.user} no item {self.item} - R$ {self.amount:.2f}"
 
-class RuralItem(models.Model):
+class RuralItem(BaseItem):
     origem = models.CharField(max_length=50, default="Rural", verbose_name="Origem")
-    tipo_item = models.CharField(
-        max_length=50,
-        choices=[
-            ("Imóvel", "Imóvel"),
-            ("Veículo", "Veículo"),
-            ("Outros Bens", "Outros Bens")
-        ],
-        verbose_name="Tipo do Item"
-    )
-    item = models.ForeignKey(
-        BaseItem,
+
+    leilao = models.ForeignKey(
+        'Auction',
         on_delete=models.CASCADE,
-        verbose_name="Item Associado",
+        related_name='rural_items',  # Unique related name
+        verbose_name='Leilão',
         null=True,
         blank=True
     )
 
     def __str__(self):
         return f"Item Rural - {self.tipo_item}"
+    
+    class Meta:
+        # Não precisa de `id`, o Django usará `codigo_item` como chave primária
+        pass
 
 
 class RealEstate(BaseItem):
@@ -136,6 +188,18 @@ class RealEstate(BaseItem):
     metragem = models.FloatField(verbose_name="Metragem")
     localizacao = models.CharField(max_length=255, verbose_name="Localização")
     estado_imovel = models.CharField(max_length=50, verbose_name="Estado do Imóvel")
+
+    leilao = models.ForeignKey(
+        'Auction',
+        on_delete=models.CASCADE,
+        related_name='real_estates',  # Unique related name
+        verbose_name='Leilão',
+        null=True,
+        blank=True
+    )
+    class Meta:
+        # Não precisa de `id`, o Django usará `codigo_item` como chave primária
+        pass
 
 class Vehicle(BaseItem):
     versao = models.CharField(max_length=100, verbose_name="Versão")
@@ -156,6 +220,31 @@ class Vehicle(BaseItem):
     combustivel = models.CharField(max_length=50, verbose_name="Combustível")
     patio = models.CharField(max_length=100, verbose_name="Pátio")
 
+    leilao = models.ForeignKey(
+        'Auction',
+        on_delete=models.CASCADE,
+        related_name='vehicles',  # Unique related name
+        verbose_name='Leilão',
+        null=True,
+        blank=True
+    )
+    class Meta:
+        # Não precisa de `id`, o Django usará `codigo_item` como chave primária
+        pass
+
+
 class OtherGoods(BaseItem):
     localizacao = models.CharField(max_length=255, verbose_name="Localização")
     estado_item = models.CharField(max_length=50, verbose_name="Estado do Item")
+
+    leilao = models.ForeignKey(
+        'Auction',
+        on_delete=models.CASCADE,
+        related_name='other_goods',  # Unique related name
+        verbose_name='Leilão',
+        null=True,
+        blank=True
+    )
+    class Meta:
+        # Não precisa de `id`, o Django usará `codigo_item` como chave primária
+        pass
