@@ -4,7 +4,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from user_management.models import Arrematante
+from .models import Arrematante, Documento
 
 class CustomSignupForm(UserCreationForm):
     TIPO_CADASTRO_CHOICES = [
@@ -101,21 +101,41 @@ class CustomSignupForm(UserCreationForm):
         user.email = self.cleaned_data['email']
         user.save()
 
-        arrematante = Arrematante.objects.create(
+        # Verificar se o Arrematante já existe para este usuário
+        arrematante, created = Arrematante.objects.get_or_create(
             user=user,
-            cpf_cnpj=self.cleaned_data['cpf_cnpj'],
-            cep=self.cleaned_data['cep'],
-            logradouro=self.cleaned_data['logradouro'],
-            numero=self.cleaned_data['numero'],
-            complemento=self.cleaned_data['complemento'],
-            bairro=self.cleaned_data['bairro'],
-            cidade=self.cleaned_data['cidade'],
-            estado=self.cleaned_data['estado'],
-            pais=self.cleaned_data['pais'],
-            telefone_comercial=self.cleaned_data['telefone_comercial'],
-            telefone_celular=self.cleaned_data['telefone_celular'],
-            tipo_cadastro=self.cleaned_data['tipo_cadastro']
+            defaults={
+                'cpf_cnpj': self.cleaned_data['cpf_cnpj'],
+                'cep': self.cleaned_data['cep'],
+                'logradouro': self.cleaned_data['logradouro'],
+                'numero': self.cleaned_data['numero'],
+                'complemento': self.cleaned_data['complemento'],
+                'bairro': self.cleaned_data['bairro'],
+                'cidade': self.cleaned_data['cidade'],
+                'estado': self.cleaned_data['estado'],
+                'pais': self.cleaned_data['pais'],
+                'telefone_comercial': self.cleaned_data['telefone_comercial'],
+                'telefone_celular': self.cleaned_data['telefone_celular'],
+                'tipo_cadastro': self.cleaned_data['tipo_cadastro'],
+            }
         )
+
+        # Se o Arrematante já existe, atualize os campos
+        if not created:
+            arrematante.cpf_cnpj = self.cleaned_data['cpf_cnpj']
+            arrematante.cep = self.cleaned_data['cep']
+            arrematante.logradouro = self.cleaned_data['logradouro']
+            arrematante.numero = self.cleaned_data['numero']
+            arrematante.complemento = self.cleaned_data['complemento']
+            arrematante.bairro = self.cleaned_data['bairro']
+            arrematante.cidade = self.cleaned_data['cidade']
+            arrematante.estado = self.cleaned_data['estado']
+            arrematante.pais = self.cleaned_data['pais']
+            arrematante.telefone_comercial = self.cleaned_data['telefone_comercial']
+            arrematante.telefone_celular = self.cleaned_data['telefone_celular']
+            arrematante.tipo_cadastro = self.cleaned_data['tipo_cadastro']
+            arrematante.save()
+
         return user
 
 class ArrematanteEditForm(forms.ModelForm):
@@ -147,3 +167,15 @@ class UserEditForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['first_name', 'last_name']
+
+# forms.py
+
+
+class DocumentoForm(forms.ModelForm):
+    class Meta:
+        model = Documento
+        fields = ['tipo_documento', 'documento']
+        widgets = {
+            'tipo_documento': forms.Select(attrs={'class': 'form-control'}),
+            'documento': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
+        }

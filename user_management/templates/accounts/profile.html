@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-{% load static %} 
+{% load static %}
 {% include '_head.html' %}
 
 <body>
@@ -11,32 +11,71 @@
             <!-- Menu Lateral -->
             <div class="col-md-3">
                 <div class="list-group">
-                    <a href="{% url 'account_change_password' %}" class="list-group-item list-group-item-action">
-                        Alterar Senha
+                    <!-- Menu suspenso Meus Dados -->
+                    <a href="#" class="list-group-item list-group-item-action bg-dark text-white" data-bs-toggle="collapse" data-bs-target="#meusDadosMenu" aria-expanded="false" aria-controls="meusDadosMenu">
+                        Meus Dados <i class="bi bi-chevron-down float-end"></i>
                     </a>
-                    <a href="{% url 'account_email' %}" class="list-group-item list-group-item-action">
-                        Alterar E-mail
+                    <div class="collapse" id="meusDadosMenu">
+                        <a href="{% url 'account_leilao' %}" class="list-group-item list-group-item-action bg-dark text-white ps-4">
+                            Leilões
+                        </a>
+                        <a href="{% url 'account_lance' %}" class="list-group-item list-group-item-action bg-dark text-white ps-4">
+                            Lances
+                        </a>
+                    </div>
+
+                    <!-- Link Financeiro -->
+                    <a href="{% url 'account_financeiro' %}" class="list-group-item list-group-item-action bg-dark text-white">
+                        Financeiro
                     </a>
-                    <a href="{% url 'account_profile_details' %}" class="list-group-item list-group-item-action active">
-                        Informações do Cadastro
+
+                    <!-- Link Documentos -->
+                    <a href="{% url 'account_documentos' %}" class="list-group-item list-group-item-action bg-dark text-white">
+                        Documentos
                     </a>
-                    <a href="{% url 'account_edit_profile' %}" class="list-group-item list-group-item-action">
-                        Editar Perfil
+
+                    <!-- Menu suspenso Configurações -->
+                    <a href="#" class="list-group-item list-group-item-action bg-dark text-white" data-bs-toggle="collapse" data-bs-target="#configuracoesMenu" aria-expanded="false" aria-controls="configuracoesMenu">
+                        Configurações <i class="bi bi-chevron-down float-end"></i>
                     </a>
+                    <div class="collapse" id="configuracoesMenu">
+                        <a href="{% url 'account_change_password' %}" class="list-group-item list-group-item-action bg-dark text-white ps-4">
+                            Alterar Senha
+                        </a>
+                        <a href="{% url 'account_email' %}" class="list-group-item list-group-item-action bg-dark text-white ps-4">
+                            Alterar E-mail
+                        </a>
+                        <a href="{% url 'account_edit_profile' %}" class="list-group-item list-group-item-action bg-dark text-white ps-4">
+                            Editar Perfil
+                        </a>
+                    </div>
                 </div>
             </div>
 
             <!-- Seção de Perfil -->
             <div class="col-md-9">
                 <!-- Seção de Introdução -->
-                <div class="row align-items-center main-section full-width">
-                    <div class="col-md-6 text-center text-md-left mb-4 mb-md-0">
-                        <span class="d-block text-secondary">Bem-vindo ao seu perfil</span>
-                        <h1 class="display-4">Olá, {{ user.username }}!</h1>
-                        <p class="lead">Aqui você pode visualizar suas informações e ajustar suas preferências.</p>
+                <div class="row align-items-center main-section full-width mb-4">
+                    <div class="col-md-6 text-center text-md-left">
+                        <span class="d-block" style="color: #4f4f4f;">Bem-vindo ao seu perfil</span>
+                        <h1 class="display-4" style="color: #4f4f4f;">Olá, {{ user.first_name }} {{ user.last_name }}!</h1>
+                        <p class="lead" style="color: #4f4f4f;">Aqui você pode visualizar suas informações e ajustar suas preferências.</p>
                     </div>
                     <div class="col-md-6">
-                        <img src="{% static 'pages/img/pexels-photo-5668473.jpeg' %}" alt="Perfil" class="img-fluid">
+                        <img src="{% static 'pages/img/pexels-photo-5668473.jpeg' %}" alt="Perfil" class="img-fluid rounded-top" style="border-top-left-radius: 30px; border-top-right-radius: 15px; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">
+                    </div>
+                </div>
+
+                <!-- Informações da Conta -->
+                <div class="row mt-5">
+                    <div class="col-md-12">
+                        <h3 class="text-primary" style="color: #4f4f4f;">Informações da Conta</h3>
+                        <ul class="list-group">
+                            <li class="list-group-item" style="color: #4f4f4f;"><strong>Nome:</strong> {{ user.first_name }} {{ user.last_name }}</li>
+                            <li class="list-group-item" style="color: #4f4f4f;"><strong>Email:</strong> {{ user.email }}</li>
+                            <li class="list-group-item" style="color: #4f4f4f;"><strong>Telefone Comercial:</strong> {{ arrematante.telefone_comercial }}</li>
+                            <li class="list-group-item" style="color: #4f4f4f;"><strong>Telefone Cadastrado:</strong> {{ arrematante.telefone_cadastrado }}</li>
+                        </ul>
                     </div>
                 </div>
             </div>

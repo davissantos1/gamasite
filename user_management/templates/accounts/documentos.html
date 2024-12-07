@@ -1,0 +1,50 @@
+<!-- templates/accounts/documentos.html -->
+{% extends "base.html" %}
+{% load i18n %}  <!-- Carrega a tag 'trans' para traduções -->
+
+{% block head_title %}
+    {% trans "Meus Documentos" %}
+{% endblock head_title %}
+
+{% block content %}
+    <div class="container form-container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-sm rounded-lg">
+                    <div class="card-body">
+                        <h2 class="text-center text-primary mb-4">{% trans "Meus Documentos" %}</h2>
+
+                        {% if documentos %}
+                            <h4>{% trans "Documentos Enviados" %}</h4>
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>{% trans "Tipo de Documento" %}</th>
+                                        <th>{% trans "Arquivo" %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for documento in documentos %}
+                                        <tr>
+                                            <td>{{ documento.get_tipo_documento_display }}</td>
+                                            <td><a href="{{ documento.documento.url }}" target="_blank">{% trans "Ver Documento" %}</a></td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <p>{% trans "Você ainda não enviou nenhum documento." %}</p>
+                        {% endif %}
+
+                        <h4>{% trans "Enviar Novo Documento" %}</h4>
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <button type="submit" class="btn btn-dark btn-block mt-3">{% trans "Enviar Documento" %}</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

@@ -22,9 +22,14 @@
                                     <small class="text-danger">{{ form.first_name.errors }}</small>
                                 </div>
                                 <div class="form-group">
-                                    {{ form.cpf_cnpj.label_tag }}
-                                    {{ form.cpf_cnpj }}
-                                    <small class="text-danger">{{ form.cpf_cnpj.errors }}</small>
+                                    {{ form.last_name.label_tag }}
+                                    {{ form.last_name }}
+                                    <small class="text-danger">{{ form.last_name.errors }}</small>
+                                </div>
+                                <div class="form-group">
+                                    {{ form.email.label_tag }}
+                                    {{ form.email }}
+                                    <small class="text-danger">{{ form.email.errors }}</small>
                                 </div>
                                 <div class="form-group">
                                     {{ form.telefone_celular.label_tag }}
@@ -34,14 +39,24 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    {{ form.last_name.label_tag }}
-                                    {{ form.last_name }}
-                                    <small class="text-danger">{{ form.last_name.errors }}</small>
+                                    {{ form.username.label_tag }}
+                                    {{ form.username }}
+                                    <small class="text-danger">{{ form.username.errors }}</small>
                                 </div>
                                 <div class="form-group">
                                     {{ form.telefone_comercial.label_tag }}
                                     {{ form.telefone_comercial }}
                                     <small class="text-danger">{{ form.telefone_comercial.errors }}</small>
+                                </div>
+                                <div class="form-group">
+                                    {{ form.tipo_cadastro.label_tag }}
+                                    {{ form.tipo_cadastro }}
+                                    <small class="text-danger">{{ form.tipo_cadastro.errors }}</small>
+                                </div>
+                                <div class="form-group">
+                                    {{ form.cpf_cnpj.label_tag }}
+                                    {{ form.cpf_cnpj }}
+                                    <small class="text-danger">{{ form.cpf_cnpj.errors }}</small>
                                 </div>
                             </div>
                         </div>
@@ -52,7 +67,6 @@
                         <h4 class="mb-3">Endereço</h4>
                         <div class="row">
                             <div class="col-md-6">
-                                <!-- Adicionar um botão de pesquisa ao lado do campo CEP -->
                                 <div class="form-group">
                                     {{ form.cep.label_tag }}
                                     <div class="input-group">
@@ -61,7 +75,6 @@
                                     </div>
                                     <small class="text-danger">{{ form.cep.errors }}</small>
                                 </div>
-                                
                                 <div class="form-group">
                                     {{ form.logradouro.label_tag }}
                                     {{ form.logradouro }}
@@ -109,18 +122,6 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    {{ form.username.label_tag }}
-                                    {{ form.username }}
-                                    <small class="text-danger">{{ form.username.errors }}</small>
-                                </div>
-                                <div class="form-group">
-                                    {{ form.email.label_tag }}
-                                    {{ form.email }}
-                                    <small class="text-danger">{{ form.email.errors }}</small>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
                                     {{ form.password1.label_tag }}
                                     {{ form.password1 }}
                                     <small class="text-danger">{{ form.password1.errors }}</small>
@@ -149,27 +150,15 @@
             // Máscara de CPF/CNPJ
             $('#id_cpf_cnpj').on('input', function() {
                 var val = $(this).val().replace(/\D/g, ''); // Remove caracteres não numéricos
-                
-                // Definir a máscara baseada no comprimento do valor
-                if (val.length <= 11) {
-                    $(this).mask('000.000.000-00', { reverse: true }); // Máscara para CPF
-                } else {
-                    $(this).mask('00.000.000/0000-00', { reverse: true }); // Máscara para CNPJ
+
+                // Definir a máscara baseada na seleção de tipo de cadastro
+                var tipoCadastro = $('input[name="tipo_cadastro"]:checked').val();
+                if (tipoCadastro === 'PF') {
+                    $(this).mask('000.000.000-00', { reverse: true });
+                } else if (tipoCadastro === 'PJ') {
+                    $(this).mask('00.000.000/0000-00', { reverse: true });
                 }
             });
-
-            // Limitar o campo ao número máximo de dígitos
-            $('#id_cpf_cnpj').on('blur', function() {
-                var val = $(this).val().replace(/\D/g, ''); // Remover caracteres não numéricos
-                if (val.length > 14) {
-                    $(this).val(val.substring(0, 14)); // Limitar a 14 dígitos no máximo
-                }
-            });
-
-            // Máscaras para outros campos
-            $('#id_cep').mask('00000-000');
-            $('#id_telefone_celular').mask('(00) 00000-0000');
-            $('#id_telefone_comercial').mask('(00) 0000-0000');
 
             // Ação para buscar o endereço via CEP
             $('#id_btn_search_cep').click(function() {
@@ -190,6 +179,11 @@
                 } else {
                     alert('CEP inválido!');
                 }
+            });
+
+            // Atualizar máscara de CPF/CNPJ ao alterar o tipo de cadastro
+            $('input[name="tipo_cadastro"]').change(function() {
+                $('#id_cpf_cnpj').trigger('input'); // Reaplicar a máscara
             });
         });
     </script>

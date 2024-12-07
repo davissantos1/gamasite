@@ -1,8 +1,29 @@
-# user_management/models.py
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+
+class Documento(models.Model):
+    TIPO_DOCUMENTO_CHOICES = [
+        ('RG', 'RG'),
+        ('CNH', 'CNH'),
+        ('PASSAPORTE', 'Passaporte'),
+        ('COMPROVANTE_RESIDENCIA', 'Comprovante de Residência'),
+        ('CONTRATO_SOCIAL', 'Contrato Social'),
+    ]
+
+    arrematante = models.ForeignKey('Arrematante', related_name='documentos', on_delete=models.CASCADE, null=True, blank=True)
+    vendedor = models.ForeignKey('Vendedor', related_name='documentos', on_delete=models.CASCADE, null=True, blank=True)
+    tipo_documento = models.CharField(max_length=50, choices=TIPO_DOCUMENTO_CHOICES)
+    documento = models.FileField(upload_to='documentos/', blank=False, null=False)
+    data_upload = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.get_tipo_documento_display()} - {self.arrematante.user.username if self.arrematante else self.vendedor.user.username}"
+
+    class Meta:
+        verbose_name = "Documento"
+        verbose_name_plural = "Documentos"
 
 
 class Arrematante(models.Model):
@@ -62,7 +83,6 @@ class Vendedor(models.Model):
         return f"{self.user.username} - {self.get_tipo_cadastro_display()}"
 
 
-
 class Admin(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="admin")
     setor = models.CharField(max_length=100, verbose_name="Setor")
@@ -87,4 +107,3 @@ def save_user_profile(sender, instance, **kwargs):
         instance.vendedor.save()
     elif hasattr(instance, "admin"):
         instance.admin.save()
-

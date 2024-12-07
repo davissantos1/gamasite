@@ -1,127 +1,129 @@
-{% extends "account/base_manage_email.html" %}
-{% load allauth i18n %}
+{% extends "base.html" %}
+
 {% block head_title %}
-    {% trans "Trocar E-mail" %}
+    Trocar E-mail
 {% endblock head_title %}
 
-{% block head %}
-    {% include '_head.html' %}
-{% endblock head %}
+{% block extra_head %}
+    <style>
+        .form-container {
+            margin-top: 50px;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .btn-block {
+            width: 100%;
+        }
+    </style>
+{% endblock extra_head %}
 
 {% block content %}
-    <div class="container form-container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card shadow-sm rounded-lg">
-                    <div class="card-body">
-                        <h2 class="text-center text-primary mb-4">{% trans "Trocar E-mail" %}</h2>
-                        <p class="text-center">
-                            {% trans "Atualize seu endereço de e-mail. Você precisará confirmar o novo e-mail após a alteração." %}
-                        </p>
-                        <hr>
+<div class="container form-container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="text-center text-primary mb-4">Trocar E-mail</h2>
+                    <p class="text-center">
+                        Atualize seu endereço de e-mail. Você precisará confirmar o novo e-mail após a alteração.
+                    </p>
+                    <hr>
 
-                        <!-- E-mails Associados -->
-                        {% if emailaddresses %}
-                            <h4 class="mb-3">{% trans "E-mails Associados" %}</h4>
-                            <p>{% trans "Os seguintes endereços de e-mail estão associados à sua conta:" %}</p>
-                            <form method="post" action="{% url 'account_email' %}">
-                                {% csrf_token %}
-                                {% for radio in emailaddress_radios %}
-                                    {% with emailaddress=radio.emailaddress %}
-                                        <div class="form-check">
-                                            <input 
-                                                type="radio" 
-                                                class="form-check-input" 
-                                                name="email" 
-                                                value="{{ emailaddress.email }}" 
-                                                id="{{ radio.id }}" 
-                                                {% if radio.checked %}checked{% endif %}>
-                                            <label class="form-check-label" for="{{ radio.id }}">
-                                                {{ emailaddress.email }}
-                                                {% if emailaddress.verified %}
-                                                    <span class="badge badge-success ml-2">{% trans "Verificado" %}</span>
-                                                {% else %}
-                                                    <span class="badge badge-warning ml-2">{% trans "Não Verificado" %}</span>
-                                                {% endif %}
-                                                {% if emailaddress.primary %}
-                                                    <span class="badge badge-primary ml-2">{% trans "Primário" %}</span>
-                                                {% endif %}
-                                            </label>
-                                        </div>
-                                    {% endwith %}
-                                {% endfor %}
-                                
-                                <!-- Botões para Ação -->
-                                <div class="mt-4">
-                                    <button type="submit" class="btn btn-dark btn-block" name="action_primary">
-                                        {% trans "Tornar Primário" %}
-                                    </button>
-                                    <button type="submit" class="btn btn-dark btn-block mt-2" name="action_send">
-                                        {% trans "Reenviar Verificação" %}
-                                    </button>
-                                    <button type="submit" class="btn btn-danger btn-block mt-2" name="action_remove">
-                                        {% trans "Remover" %}
-                                    </button>
-                                </div>
-                            </form>
-                        {% else %}
-                            <div class="alert alert-warning mt-4">
-                                {% include "account/snippets/warn_no_email.html" %}
-                            </div>
-                        {% endif %}
-                        
-                        <hr>
+                    {% if emailaddresses %}
+                        <h4 class="mb-3">E-mails Associados</h4>
+                        <p>Os seguintes endereços de e-mail estão associados à sua conta:</p>
+                        <form method="post" action="{% url 'account_email' %}">
+                            {% csrf_token %}
+                            {% for radio in emailaddress_radios %}
+                                {% with emailaddress=radio.emailaddress %}
+                                    <div class="form-check">
+                                        <input 
+                                            type="radio" 
+                                            class="form-check-input" 
+                                            name="email" 
+                                            value="{{ emailaddress.email }}" 
+                                            id="{{ radio.id }}" 
+                                            {% if radio.checked %}checked{% endif %}>
+                                        <label class="form-check-label" for="{{ radio.id }}">
+                                            {{ emailaddress.email }}
+                                            {% if emailaddress.verified %}
+                                                <span class="badge badge-success ml-2">Verificado</span>
+                                            {% else %}
+                                                <span class="badge badge-warning ml-2">Não Verificado</span>
+                                            {% endif %}
+                                            {% if emailaddress.primary %}
+                                                <span class="badge badge-primary ml-2">Primário</span>
+                                            {% endif %}
+                                        </label>
+                                    </div>
+                                {% endwith %}
+                            {% endfor %}
 
-                        <!-- Adicionar Novo E-mail -->
-                        {% if can_add_email %}
-                            <h4 class="mb-3">{% trans "Adicionar Novo E-mail" %}</h4>
-                            <form method="post" action="{% url 'account_email' %}">
-                                {% csrf_token %}
-                                <div class="form-group">
-                                    <label for="id_email">{% trans "Novo E-mail" %}</label>
-                                    <input 
-                                        type="email" 
-                                        class="form-control {% if form.email.errors %}is-invalid{% endif %}" 
-                                        name="email" 
-                                        id="id_email" 
-                                        placeholder="{% trans 'Digite o novo e-mail' %}" 
-                                        required>
-                                    {% if form.email.errors %}
-                                        <div class="invalid-feedback">
-                                            {{ form.email.errors.0 }}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                
-                                <!-- Botão para Adicionar Novo E-mail -->
-                                <button type="submit" class="btn btn-dark btn-block mt-3" name="action_add">
-                                    {% trans "Adicionar E-mail" %}
+                            <div class="mt-4">
+                                <button type="submit" class="btn btn-dark btn-block" name="action_primary">
+                                    Tornar Primário
                                 </button>
-                            </form>
-                        {% endif %}
-                    </div>
+                                <button type="submit" class="btn btn-dark btn-block mt-2" name="action_send">
+                                    Reenviar Verificação
+                                </button>
+                                <button type="submit" class="btn btn-danger btn-block mt-2" name="action_remove">
+                                    Remover
+                                </button>
+                            </div>
+                        </form>
+                    {% else %}
+                        <div class="alert alert-warning mt-4">
+                            Nenhum e-mail associado encontrado.
+                        </div>
+                    {% endif %}
+
+                    <hr>
+
+                    {% if can_add_email %}
+                        <h4 class="mb-3">Adicionar Novo E-mail</h4>
+                        <form method="post" action="{% url 'account_email' %}">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="id_email">Novo E-mail</label>
+                                <input 
+                                    type="email" 
+                                    class="form-control {% if form.email.errors %}is-invalid{% endif %}" 
+                                    name="email" 
+                                    id="id_email" 
+                                    placeholder="Digite o novo e-mail" 
+                                    required>
+                                {% if form.email.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.email.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <button type="submit" class="btn btn-dark btn-block mt-3" name="action_add">
+                                Adicionar E-mail
+                            </button>
+                        </form>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
+</div>
 {% endblock content %}
 
-{% block footer %}
-    {% include '_footer.html' %}
-{% endblock footer %}
-
 {% block extra_body %}
-    <script>
-        (function() {
-            var message = "{% trans 'Você realmente deseja remover o e-mail selecionado?' %}";
-            var actions = document.getElementsByName('action_remove');
-            if (actions.length) {
-                actions[0].addEventListener("click", function(e) {
-                    if (!confirm(message)) {
-                        e.preventDefault();
-                    }
-                });
-            }
-        })();
-    </script>
+<script>
+    (function() {
+        var message = "Você realmente deseja remover o e-mail selecionado?";
+        var actions = document.getElementsByName('action_remove');
+        if (actions.length) {
+            actions[0].addEventListener("click", function(e) {
+                if (!confirm(message)) {
+                    e.preventDefault();
+                }
+            });
+        }
+    })();
+</script>
 {% endblock extra_body %}
