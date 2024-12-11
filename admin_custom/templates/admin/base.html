@@ -1,5 +1,6 @@
 {% load adminlte_helpers i18n %}
-{% load static %}<!DOCTYPE html>
+{% load static %}
+<!DOCTYPE html>
 <html>
 <head>
     {% block title_outer %}
@@ -44,8 +45,18 @@
                             <small>{% block page_description %}{% endblock %}</small>
                             {% endblock %}
                         </h1>
+
                         {% block breadcrumbs %}
-                            {# Breadcrumb implementation left to developers #}
+                            <!-- Breadcrumbs -->
+                            <ol class="breadcrumb">
+                                <li><a href="{% url 'admin:index' %}"><i class="fa fa-dashboard"></i> Home</a></li>
+                                {% block breadcrumb_items %}
+                                    <!-- Adicionar Breadcrumbs específicos para a página atual -->
+                                    {% if request.path %}
+                                        <li class="active">{{ page_name }}</li>
+                                    {% endif %}
+                                {% endblock %}
+                            </ol>
                         {% endblock %}
                     {% endblock no_heading %}
                 </section>

@@ -31,19 +31,19 @@
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'pages:home' %}" style="transition: color 0.3s; color:#fff;">Página Inicial</a>
             </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="leiloesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="transition: color 0.3s;color:#fff;">
+                    Leilões
+                </a>
+                <div class="dropdown-menu" aria-labelledby="leiloesDropdown">
+                    <a class="dropdown-item" href="{% url 'pages:leiloes_ao_vivo' %}">Leilões Ao Vivo</a>
+                    <a class="dropdown-item" href="{% url 'pages:calendario' %}">Calendário</a>
+                </div>
+            </li>
             <li class="nav-item">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="leiloesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="transition: color 0.3s;color:#fff;">
-                        Leilões
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="leiloesDropdown">
-                        <a class="dropdown-item" href="{% url 'pages:leiloes_ao_vivo' %}">Leilões Ao Vivo</a>
-                        <a class="dropdown-item" href="{% url 'pages:calendario' %}">Calendário</a>
-                    </div>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'pages:como_participar' %}" style="transition: color 0.3s;color:#fff;">Como Participar</a>
-                </li>
+                <a class="nav-link" href="{% url 'pages:como_participar' %}" style="transition: color 0.3s;color:#fff;">Como Participar</a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" href="{% url 'categories:imoveis' %}" style="transition: color 0.3s; color:#fff;">Imóveis</a>
             </li>
             <li class="nav-item">
@@ -55,7 +55,21 @@
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'categories:outros_bens' %}" style="transition: color 0.3s; color:#fff;">Outros Bens</a>
             </li>
-           
+            {% if user.is_authenticated %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="" id="dashboardDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="transition: color 0.3s;color:#fff;">
+                        Dashboard
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="dashboardDropdown">
+                        <a class="dropdown-item" href="{% url 'pages:inicio' %}">Início</a>
+                        <a class="dropdown-item" href="{% url 'pages:lotes' %}">Lotes</a>
+                        <a class="dropdown-item" href="{% url 'pages:lances' %}">Lances</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'pages:financeiro_cliente' %}" style="transition: color 0.3s; color:#fff;">Financeiro</a>
+                </li>
+            {% endif %}
         </ul>
     </div>
 </nav>

@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Meus Lotes{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Meus Lotes</h1>
+
+    <!-- Campo de Filtro -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <h5>Filtrar Lotes</h5>
+        </div>
+        <div class="card-body">
+            <form method="get">
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label for="filter-status">Status</label>
+                        <select class="form-control" id="filter-status" name="status">
+                            <option value="">Todos</option>
+                            <option value="participado">Participados</option>
+                            <option value="arrematado">Arrematados</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="filter-date">Data</label>
+                        <input type="date" class="form-control" id="filter-date" name="date">
+                    </div>
+                    <div class="form-group col-md-4 align-self-end">
+                        <button type="submit" class="btn btn-primary btn-block">Filtrar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lista de Lotes -->
+    <div class="row">
+        {% if lotes.exists %}
+            {% for lote in lotes %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <img src="{{ lote.imagem.url }}" class="card-img-top" alt="{{ lote.nome }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ lote.nome }}</h5>
+                            <p class="card-text">{{ lote.descricao|truncatewords:15 }}</p>
+                            <p><strong>Status:</strong> {{ lote.status }}</p>
+                            <p><strong>Data:</strong> {{ lote.data|date:"d/m/Y" }}</p>
+                            <a href="{% url 'pages:detalhes_lote' lote.id %}" class="btn btn-primary">Ver Detalhes</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <p class="text-muted">Nenhum lote encontrado para os critérios selecionados.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

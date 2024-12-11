@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Banner de Marketing -->
+    <div class="jumbotron text-white bg-dark mb-4">
+        <h1 class="display-4">Bem-vindo ao seu Painel</h1>
+        <p class="lead">Explore os leilões, acompanhe seus lotes e veja seus lances em um só lugar.</p>
+        <hr class="my-4">
+        <p>Aproveite nossas ofertas exclusivas e participe dos leilões ao vivo!</p>
+        <a class="btn btn-primary btn-lg" href="{% url 'pages:leiloes_ao_vivo' %}" role="button">Ver Leilões ao Vivo</a>
+    </div>
+
+    <div class="row">
+        <!-- Filtro lateral -->
+        <div class="col-md-3">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5>Filtros</h5>
+                </div>
+                <div class="card-body">
+                    <form method="get">
+                        <div class="form-group">
+                            <label for="filter-category">Categoria</label>
+                            <select class="form-control" id="filter-category" name="category">
+                                <option value="">Todas</option>
+                                <option value="imoveis">Imóveis</option>
+                                <option value="veiculos">Veículos</option>
+                                <option value="rural">Rural</option>
+                                <option value="outros">Outros</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="filter-status">Status</label>
+                            <select class="form-control" id="filter-status" name="status">
+                                <option value="">Todos</option>
+                                <option value="ativo">Ativo</option>
+                                <option value="finalizado">Finalizado</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Aplicar</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Aba de Mensagens -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5>Mensagens</h5>
+                </div>
+                <div class="card-body">
+                    {% if mensagens.exists %}
+                        <ul class="list-group">
+                            {% for mensagem in mensagens %}
+                                <li class="list-group-item">
+                                    <strong>{{ mensagem.titulo }}</strong>
+                                    <p>{{ mensagem.conteudo|truncatewords:10 }}</p>
+                                    <small class="text-muted">{{ mensagem.data_envio|date:"d/m/Y H:i" }}</small>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>Você não tem mensagens no momento.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Conteúdo principal -->
+        <div class="col-md-9">
+            <!-- Card: Leilões -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5>Leilões</h5>
+                </div>
+                <div class="card-body">
+                    {% if leiloes.exists %}
+                        <div class="row">
+                            {% for leilao in leiloes %}
+                                <div class="col-md-6 mb-4">
+                                    <div class="card">
+                                        <img src="{{ leilao.imagem.url }}" class="card-img-top" alt="{{ leilao.nome }}">
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ leilao.nome }}</h5>
+                                            <p class="card-text">{{ leilao.descricao|truncatewords:15 }}</p>
+                                            <a href="{% url 'pages:detalhes_leilao' leilao.id %}" class="btn btn-primary">Ver Detalhes</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p>Você não tem leilões disponíveis no momento.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Card: Lotes -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5>Lotes</h5>
+                </div>
+                <div class="card-body">
+                    {% if lotes.exists %}
+                        <div class="row">
+                            {% for lote in lotes %}
+                                <div class="col-md-6 mb-4">
+                                    <div class="card">
+                                        <img src="{{ lote.imagem.url }}" class="card-img-top" alt="{{ lote.nome }}">
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ lote.nome }}</h5>
+                                            <p class="card-text">{{ lote.descricao|truncatewords:15 }}</p>
+                                            <a href="{% url 'pages:detalhes_lote' lote.id %}" class="btn btn-success">Ver Detalhes</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p>Você não tem lotes disponíveis no momento.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Card: Lances -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h5>Meus Lances</h5>
+                </div>
+                <div class="card-body">
+                    {% if lances.exists %}
+                        <div class="row">
+                            {% for lance in lances %}
+                                <div class="col-md-6 mb-4">
+                                    <div class="card">
+                                        <img src="{{ lance.lote.imagem.url }}" class="card-img-top" alt="{{ lance.lote.nome }}">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Lote: {{ lance.lote.nome }}</h5>
+                                            <p class="card-text">Valor do Lance: R$ {{ lance.valor }}</p>
+                                            <a href="{% url 'pages:detalhes_lote' lance.lote.id %}" class="btn btn-warning">Ver Lote</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p>Você não tem lances ativos no momento.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

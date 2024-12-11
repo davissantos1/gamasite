@@ -11,7 +11,7 @@ def default_auction_time():
 
 def generate_auction_code(auction):
     """Gera o código de leilão com base no nome do leilão e números aleatórios."""
-    return f"{auction.descricao.replace(' ', '_').upper()}_{uuid.uuid4().hex[:8].upper()}"
+    return f"{auction.comitente.replace(' ', '_').upper()}_{uuid.uuid4().hex[:8].upper()}"
 
 def generate_item_code(item):
     """Gera o código do item com base no nome do item e números aleatórios."""
@@ -20,7 +20,7 @@ def generate_item_code(item):
 class Auction(models.Model):
     codigo_leilao = models.CharField(
         max_length=50,
-        primary_key=True,  # Torna 'codigo_leilao' a chave primária
+        primary_key=True,
         verbose_name="Código do Leilão",
         unique=True
     )
@@ -45,12 +45,21 @@ class Auction(models.Model):
         default=0,
         verbose_name="Quantidade de Lotes"
     )
+    imagem = models.ImageField(upload_to='leiloes/', default='default/default_image.jpg')
+    documento_editais = models.FileField(upload_to='editais/', null=True, blank=True, verbose_name="Documento Edital (PDF)")
 
+    @property
     def is_live(self):
         """Verifica se o leilão está ao vivo."""
         start = self.date_time
         end = start + timedelta(hours=self.duration_hours)
         return start <= now() <= end and self.active
+
+    @property
+    def is_scheduled_for_today(self):
+        """Verifica se o leilão está programado para hoje."""
+        today = now().date()
+        return self.date_time.date() == today and self.date_time > now() and not self.is_live
 
     def save(self, *args, **kwargs):
         if not self.codigo_leilao:  # Gera o código do leilão se não existir
@@ -61,6 +70,7 @@ class Auction(models.Model):
 
     def __str__(self):
         return f"Leilão {self.codigo_leilao}"
+
 
 class BaseItem(models.Model):
     nome = models.CharField(
@@ -76,8 +86,8 @@ class BaseItem(models.Model):
         default=0.00
     )
     codigo_item = models.CharField(
-        max_length=50,  # Maior tamanho devido ao código gerado
-        primary_key=True,  # Torna 'codigo_item' a chave primária
+        max_length=50,
+        primary_key=True,
         verbose_name="Código do Item",
     )
     leilao = models.ForeignKey(
@@ -95,9 +105,28 @@ class BaseItem(models.Model):
         null=True,
         blank=True
     )
+    imagens = models.ManyToManyField('ItemImage', related_name='itens', verbose_name="Imagens do Item")
+    valor_arrematado = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name="Valor Arrematado",
+        null=True,
+        blank=True
+    )
+    status_lote = models.CharField(
+        max_length=50,
+        choices=[('aceitando_lances', 'Aceitando lances'), ('arrematado', 'Arrematado'), ('pendente_de_pagamento', 'Pendente de pagamento')],
+        default='aceitando_lances',
+        verbose_name="Status do Lote"
+    )
+    status_pagamento = models.CharField(
+        max_length=50,
+        choices=[('pendente', 'Pendente'), ('pago', 'Pago')],
+        default='pendente',
+        verbose_name="Status de Pagamento"
+    )
 
     def save(self, *args, **kwargs):
-        # Gera o código do item se não existir
         if not self.codigo_item:
             self.codigo_item = generate_item_code(self)
         
@@ -121,7 +150,18 @@ class BaseItem(models.Model):
         return f"{self.nome} ({self.codigo_item})"
 
     class Meta:
-        abstract = True  # Este modelo permanece abstrato
+        abstract = True
+
+class ItemImage(models.Model):
+    imagem = models.ImageField(upload_to='media/itens/', verbose_name="Imagem do Item")
+    descricao = models.CharField(max_length=255, blank=True, null=True, verbose_name="Descrição da Imagem")
+
+    def __str__(self):
+        return self.descricao if self.descricao else f"Imagem {self.id}"
+
+    class Meta:
+        verbose_name = "Imagem do Item"
+        verbose_name_plural = "Imagens dos Itens"
 
 class ItemType(models.Model):
     nome = models.CharField(max_length=100, verbose_name="Nome do Tipo de Item", unique=True)
@@ -133,6 +173,7 @@ class ItemType(models.Model):
     class Meta:
         verbose_name = "Tipo de Item"
         verbose_name_plural = "Tipos de Itens"
+
 
 class Bid(models.Model):
     item = models.ForeignKey(
@@ -165,6 +206,7 @@ class Bid(models.Model):
 
 class RuralItem(BaseItem):
     origem = models.CharField(max_length=50, default="Rural", verbose_name="Origem")
+    imagens = models.ManyToManyField('ItemImage', related_name='rural_items', verbose_name="Imagens do Item Rural")
 
     leilao = models.ForeignKey(
         'Auction',
@@ -179,11 +221,11 @@ class RuralItem(BaseItem):
         return f"Item Rural - {self.tipo_item}"
     
     class Meta:
-        # Não precisa de `id`, o Django usará `codigo_item` como chave primária
         pass
 
 
 class RealEstate(BaseItem):
+    imagens = models.ManyToManyField('ItemImage', related_name='real_estates', verbose_name="Imagens do Imóvel")
     quartos = models.IntegerField(verbose_name="Quartos")
     metragem = models.FloatField(verbose_name="Metragem")
     localizacao = models.CharField(max_length=255, verbose_name="Localização")
@@ -197,11 +239,12 @@ class RealEstate(BaseItem):
         null=True,
         blank=True
     )
+
     class Meta:
-        # Não precisa de `id`, o Django usará `codigo_item` como chave primária
         pass
 
 class Vehicle(BaseItem):
+    imagens = models.ManyToManyField('ItemImage', related_name='vehicles', verbose_name="Imagens do Veículo")
     versao = models.CharField(max_length=100, verbose_name="Versão")
     fabricacao = models.IntegerField(verbose_name="Ano de Fabricação")
     marca = models.CharField(max_length=50, verbose_name="Marca")
@@ -228,23 +271,24 @@ class Vehicle(BaseItem):
         null=True,
         blank=True
     )
+
     class Meta:
-        # Não precisa de `id`, o Django usará `codigo_item` como chave primária
         pass
 
-
 class OtherGoods(BaseItem):
-    localizacao = models.CharField(max_length=255, verbose_name="Localização")
-    estado_item = models.CharField(max_length=50, verbose_name="Estado do Item")
-
+    imagens = models.ManyToManyField('ItemImage', related_name='other_goods', verbose_name="Imagens do Item")
     leilao = models.ForeignKey(
         'Auction',
         on_delete=models.CASCADE,
-        related_name='other_goods',  # Unique related name
+        related_name='other_goods',  # Unique related name for Other Goods
         verbose_name='Leilão',
         null=True,
         blank=True
     )
+
+    def __str__(self):
+        return f"Outros Bens - {self.tipo_item}"
+
     class Meta:
-        # Não precisa de `id`, o Django usará `codigo_item` como chave primária
-        pass
+        verbose_name = "Outro Bem"
+        verbose_name_plural = "Outros Bens"

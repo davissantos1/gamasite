@@ -168,8 +168,6 @@ class UserEditForm(forms.ModelForm):
         model = User
         fields = ['first_name', 'last_name']
 
-# forms.py
-
 
 class DocumentoForm(forms.ModelForm):
     class Meta:

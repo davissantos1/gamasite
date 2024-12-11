@@ -38,8 +38,8 @@
                                                 <ul class="list-unstyled mt-2">
                                                     {% for auction in day.auctions %}
                                                         <li>
-                                                            <a href="{% url 'leilao_detalhe' auction.id %}">
-                                                                {{ auction.lote }} - {{ auction.date_time|time:"H:i" }}
+                                                            <a href="{% url 'pages:leilao_detalhe' auction.codigo_leilao %}">
+                                                                {{ auction.comitente }} - {{ auction.date_time|time:"H:i" }}
                                                             </a>
                                                         </li>
                                                     {% endfor %}
