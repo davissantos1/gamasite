@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum, Count
-from auction_management.models import RuralItem, RealEstate, Vehicle, OtherGoods, Auction, Bid
+from auction_management.models import RuralItem, RealEstate, Vehicle, OtherGoods, Auction, Bid, BaseItem
 
 @login_required
 def list_clients(request):

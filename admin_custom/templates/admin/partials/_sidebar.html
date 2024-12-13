@@ -21,31 +21,107 @@
                 <!-- Navegação Principal -->
                 <li class="nav-header">Gerenciamento Gama</li>
                 
-                <li class="nav-item">
-                    <a href="{% url 'admin:auth_user_changelist' %}" class="nav-link">
+                <!-- Submenu Clientes -->
+                <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-users"></i>
-                        <p>Clientes</p>
+                        <p>
+                            Clientes
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
                     </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{% url 'admin:user_management_arrematante_changelist' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Arrematantes</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'admin:user_management_vendedor_changelist' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Vendedores</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'admin:user_management_documento_changelist' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Documentos</p>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
+
+                <!-- Leilões -->
                 <li class="nav-item">
                     <a href="{% url 'admin:auction_management_auction_changelist' %}" class="nav-link">
                         <i class="nav-icon fas fa-gavel"></i>
                         <p>Leilões</p>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a href="{% url 'admin:categories_auctioncategory_changelist' %}" class="nav-link">
-                        <i class="nav-icon fas fa-list-alt"></i>
-                        <p>Categorias</p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="" class="nav-link">
+
+                <!-- Submenu Itens -->
+                <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-cubes"></i>
-                        <p>Itens</p>
+                        <p>
+                            Itens
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
                     </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{% url 'admin:auction_management_vehicle_changelist' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Veículos</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'admin:auction_management_realestate_changelist' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Imóveis</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'admin:auction_management_ruralitem_changelist' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Rural</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'admin:auction_management_othergoods_changelist' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Outros Bens</p>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
-                
+
+                <!-- Submenu Configurações -->
+                <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-cogs"></i>
+                        <p>
+                            Configurações
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{% url 'admin:categories_auctioncategory_changelist' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Categorias</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'admin:auction_management_itemtype_changelist' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Tipos de Itens</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
                 <!-- Submenu Financeiro -->
                 <li class="nav-item has-treeview">
                     <a href="#" class="nav-link">
@@ -57,7 +133,7 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="" class="nav-link">
+                            <a href="#" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Lances</p>
                             </a>
@@ -88,19 +164,19 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="" class="nav-link">
+                            <a href="#" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Banners</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="" class="nav-link">
+                            <a href="#" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Emails</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="" class="nav-link">
+                            <a href="#" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Páginas</p>
                             </a>
@@ -119,25 +195,25 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="" class="nav-link">
+                            <a href="#" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Resumo</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="" class="nav-link">
+                            <a href="#" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Financeiro</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="" class="nav-link">
+                            <a href="#" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Itens</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="" class="nav-link">
+                            <a href="#" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Clientes</p>
                             </a>
@@ -145,17 +221,11 @@
                     </ul>
                 </li>
 
-                <!-- Links adicionais -->
+                <!-- Usuários -->
                 <li class="nav-item">
-                    <a href="" class="nav-link">
+                    <a href="{% url 'admin:auth_user_changelist' %}" class="nav-link">
                         <i class="nav-icon fas fa-user"></i>
                         <p>Usuários</p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="" class="nav-link">
-                        <i class="nav-icon fas fa-cogs"></i>
-                        <p>Configurações</p>
                     </a>
                 </li>
             </ul>

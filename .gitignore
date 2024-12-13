@@ -37,3 +37,9 @@ coverage/
 *.pem
 cert.crt
 cert.key
+
+# Ignore media directory (uploaded files)
+media/
+
+# Ignore editais (publications or documents directory)
+editais/

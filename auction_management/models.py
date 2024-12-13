@@ -17,6 +17,7 @@ def generate_item_code(item):
     """Gera o código do item com base no nome do item e números aleatórios."""
     return f"{item.nome.replace(' ', '_').upper()}_{uuid.uuid4().hex[:8].upper()}"
 
+
 class Auction(models.Model):
     codigo_leilao = models.CharField(
         max_length=50,
@@ -66,7 +67,20 @@ class Auction(models.Model):
             self.codigo_leilao = generate_auction_code(self)
         if self.date_time + timedelta(hours=self.duration_hours) < now():
             self.active = False
+
+        # Verifica o número total de itens associados ao leilão
+        total_items = (
+            self.vehicles.count() + 
+            self.real_estates.count() + 
+            self.other_goods.count() + 
+            self.rural_items.count()
+        )
+
+        if total_items > self.quantidade_lotes:
+            raise ValueError("O número de itens associados excede a quantidade de lotes definida.")
+    
         super().save(*args, **kwargs)
+
 
     def __str__(self):
         return f"Leilão {self.codigo_leilao}"
@@ -129,7 +143,21 @@ class BaseItem(models.Model):
     def save(self, *args, **kwargs):
         if not self.codigo_item:
             self.codigo_item = generate_item_code(self)
-        
+
+        if not self.codigo_item:
+            self.codigo_item = generate_item_code(self)
+
+        if self.leilao:
+            total_items = (
+                self.leilao.vehicles.count() +
+                self.leilao.real_estates.count() +
+                self.leilao.other_goods.count() +
+                self.leilao.rural_items.count()
+            )
+
+        if total_items >= self.leilao.quantidade_lotes:
+            raise ValueError("Este leilão já atingiu o número máximo de itens permitido.")
+
         # Associar automaticamente o tipo de item com base na categoria do leilão
         if self.leilao:
             if not self.tipo_item:
@@ -164,8 +192,22 @@ class ItemImage(models.Model):
         verbose_name_plural = "Imagens dos Itens"
 
 class ItemType(models.Model):
-    nome = models.CharField(max_length=100, verbose_name="Nome do Tipo de Item", unique=True)
-    descricao = models.TextField(verbose_name="Descrição", blank=True, null=True)
+    VEICULO = 'Veículo'
+    IMOVEL = 'Imóvel'
+    OUTROS = 'Outros'
+
+    ITEM_TYPE_CHOICES = [
+        (VEICULO, 'Veículo'),
+        (IMOVEL, 'Imóvel'),
+        (OUTROS, 'Outros'),
+    ]
+
+    nome = models.CharField(
+        max_length=100,
+        verbose_name="Nome do Tipo de Item",
+        choices=ITEM_TYPE_CHOICES,
+        unique=True
+    )
 
     def __str__(self):
         return self.nome
@@ -205,6 +247,7 @@ class Bid(models.Model):
         return f"Lance de {self.user} no item {self.item} - R$ {self.amount:.2f}"
 
 class RuralItem(BaseItem):
+    imagem = models.ImageField(upload_to='rural/', default='default/default_image.jpg')  
     origem = models.CharField(max_length=50, default="Rural", verbose_name="Origem")
     imagens = models.ManyToManyField('ItemImage', related_name='rural_items', verbose_name="Imagens do Item Rural")
 
@@ -225,6 +268,7 @@ class RuralItem(BaseItem):
 
 
 class RealEstate(BaseItem):
+    imagem = models.ImageField(upload_to='imoveis/', default='default/default_image.jpg')  
     imagens = models.ManyToManyField('ItemImage', related_name='real_estates', verbose_name="Imagens do Imóvel")
     quartos = models.IntegerField(verbose_name="Quartos")
     metragem = models.FloatField(verbose_name="Metragem")
@@ -244,6 +288,7 @@ class RealEstate(BaseItem):
         pass
 
 class Vehicle(BaseItem):
+    imagem = models.ImageField(upload_to='vehicles/', default='default/default_image.jpg')
     imagens = models.ManyToManyField('ItemImage', related_name='vehicles', verbose_name="Imagens do Veículo")
     versao = models.CharField(max_length=100, verbose_name="Versão")
     fabricacao = models.IntegerField(verbose_name="Ano de Fabricação")
@@ -276,6 +321,7 @@ class Vehicle(BaseItem):
         pass
 
 class OtherGoods(BaseItem):
+    imagem = models.ImageField(upload_to='outros_bens/', default='default/default_image.jpg')  
     imagens = models.ManyToManyField('ItemImage', related_name='other_goods', verbose_name="Imagens do Item")
     leilao = models.ForeignKey(
         'Auction',
@@ -292,3 +338,5 @@ class OtherGoods(BaseItem):
     class Meta:
         verbose_name = "Outro Bem"
         verbose_name_plural = "Outros Bens"
+
+

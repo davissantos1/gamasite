@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.core.exceptions import ValidationError
 
 class Documento(models.Model):
     TIPO_DOCUMENTO_CHOICES = [
@@ -12,11 +13,25 @@ class Documento(models.Model):
         ('CONTRATO_SOCIAL', 'Contrato Social'),
     ]
 
-    arrematante = models.ForeignKey('Arrematante', related_name='documentos', on_delete=models.CASCADE, null=True, blank=True)
-    vendedor = models.ForeignKey('Vendedor', related_name='documentos', on_delete=models.CASCADE, null=True, blank=True)
+    arrematante = models.ForeignKey(
+        'Arrematante', related_name='documentos', on_delete=models.CASCADE, null=True, blank=True
+    )
+    vendedor = models.ForeignKey(
+        'Vendedor', related_name='documentos', on_delete=models.CASCADE, null=True, blank=True
+    )
     tipo_documento = models.CharField(max_length=50, choices=TIPO_DOCUMENTO_CHOICES)
     documento = models.FileField(upload_to='documentos/', blank=False, null=False)
     data_upload = models.DateTimeField(auto_now_add=True)
+
+    def clean(self):
+        # Exemplo: Verificar o tamanho máximo do arquivo (10 MB)
+        max_file_size = 10 * 1024 * 1024
+        if self.documento and self.documento.size > max_file_size:
+            raise ValidationError("O tamanho do arquivo não pode exceder 10 MB.")
+        # Exemplo: Verificar extensões permitidas
+        valid_extensions = ['.pdf', '.jpg', '.png']
+        if self.documento and not any(self.documento.name.endswith(ext) for ext in valid_extensions):
+            raise ValidationError(f"Permitido apenas arquivos: {', '.join(valid_extensions)}")
 
     def __str__(self):
         return f"{self.get_tipo_documento_display()} - {self.arrematante.user.username if self.arrematante else self.vendedor.user.username}"
@@ -24,6 +39,7 @@ class Documento(models.Model):
     class Meta:
         verbose_name = "Documento"
         verbose_name_plural = "Documentos"
+
 
 
 class Arrematante(models.Model):
