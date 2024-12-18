@@ -1,0 +1,236 @@
+/* Estilos gerais */
+body {
+    background-color: #fff;
+    font-family: 'Poppins', sans-serif; /* Fonte arredondada */
+}
+
+/* Cores principais */
+:root {
+    --cor-primaria: #343a40; /* Cinza primário */
+    --cor-secundaria: #6c757d; /* Cinza secundário */
+    --cor-background: #f4f4f4; /* Fundo claro */
+    --cor-accent: #343a40; /* Escuro, para textos e botões */
+    --cor-hover: #6c757d; /* Cor de hover para botões e links */
+}
+
+/* Estilos para texto */
+.text-primario {
+    color: var(--cor-primaria) !important; /* Cor primária para todos os títulos */
+}
+
+.text-secundario {
+    color: #fff !important; /* Cor primária para todos os títulos */
+}
+
+/* Fundo primário na página */
+body {
+    background-color: var(--cor-background); /* Fundo claro */
+}
+
+/* Estilizando a área com fundo primário */
+.bg-primario {
+    background-color: var(--cor-primaria);
+}
+
+/* Botões primários e secundários */
+.btn-primario {
+    background-color: var(--cor-primaria);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primario:hover {
+    background-color: var(--cor-hover);
+}
+
+.btn-secundario {
+    background-color: transparent;
+    color: var(--cor-primaria);
+    border: 2px solid var(--cor-primaria);
+    padding: 12px 20px;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.btn-secundario:hover {
+    background-color: var(--cor-primaria);
+    color: white;
+}
+
+/* Estilizando o dropdown */
+.navbar .dropdown-menu {
+    display: none;
+    background-color: #f8f8f8;
+    border: none;
+}
+
+.navbar .dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+.navbar .dropdown-menu a {
+    color: var(--cor-accent);
+    padding: 8px 16px;
+    text-decoration: none;
+    display: block;
+    transition: background-color 0.3s;
+}
+
+.navbar .dropdown-menu a:hover {
+    background-color: #e0e0e0;
+}
+
+.navbar-nav .nav-item .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 0;
+}
+
+.navbar-brand img {
+    margin-left: 75px;
+    height: 70px;
+}
+
+.search-bar {
+    margin: auto;
+    flex-grow: 1;
+    max-width: 600px;
+}
+
+.search-nav {
+    width: 70% !important;
+}
+
+.form-container {
+    margin-top: 10px;
+}
+
+.nav-link:hover {
+    text-decoration: underline;
+    text-decoration-color: white;
+    color: inherit;
+}
+
+.navbar {
+    padding: 1rem;
+}
+
+.search-bar input {
+    width: 70%;
+}
+
+.btn-outline-secondary {
+    border-color: var(--cor-accent);
+    color: var(--cor-accent);
+}
+
+.btn-outline-secondary:hover {
+    background-color: var(--cor-accent);
+    color: white;
+}
+
+.btn-secondary {
+    background-color: var(--cor-accent);
+    border-color: var(--cor-accent);
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+
+.display-4 {
+    font-weight: 700;
+    color: var(--cor-accent);
+}
+
+.lead {
+    font-size: 1.25rem;
+    font-weight: 300;
+}
+
+.btn-lg {
+    padding: 0.75rem 1.25rem;
+    font-size: 1.25rem;
+}
+
+.img-fluid {
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0px 0px 0 #00000070;
+    border-top-left-radius: 80px;
+    border-top-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+}
+
+.central-section {
+    padding: 60px 0;
+    background-color: #f8f9fa;
+}
+
+.central-section .card {
+    margin-bottom: 30px;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.central-section .card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
+
+.central-section .card-body {
+    padding: 20px;
+}
+
+.central-section .card-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.central-section .card-text {
+    font-size: 1rem;
+    color: var(--cor-secundaria);
+}
+
+#links {
+    background-color: var(--cor-accent);
+    color: #fff;
+}
+
+/* Estilos do Footer */
+.footer {
+    background-color: var(--cor-accent);
+    color: white;
+}
+
+.footer a {
+    color: white;
+    text-decoration: none;
+}
+
+.footer a:hover {
+    text-decoration: underline;
+}
+
+.footer h5 {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.footer p {
+    font-size: 1rem;
+    color: #b1b1b1;
+}
+
+.footer .text-center {
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 1rem 0;
+}

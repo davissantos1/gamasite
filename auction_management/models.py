@@ -4,6 +4,7 @@ from django.conf import settings
 from datetime import timedelta
 import uuid
 from categories.models import AuctionCategory
+from payment.models import Bid
 
 def default_auction_time():
     """Retorna a data e hora atual."""
@@ -139,11 +140,12 @@ class BaseItem(models.Model):
         default='pendente',
         verbose_name="Status de Pagamento"
     )
+    destacado = models.BooleanField(
+        default=False,
+        verbose_name="Item Destacado"
+    )
 
     def save(self, *args, **kwargs):
-        if not self.codigo_item:
-            self.codigo_item = generate_item_code(self)
-
         if not self.codigo_item:
             self.codigo_item = generate_item_code(self)
 
@@ -179,6 +181,7 @@ class BaseItem(models.Model):
 
     class Meta:
         abstract = True
+
 
 class ItemImage(models.Model):
     imagem = models.ImageField(upload_to='media/itens/', verbose_name="Imagem do Item")
@@ -217,34 +220,7 @@ class ItemType(models.Model):
         verbose_name_plural = "Tipos de Itens"
 
 
-class Bid(models.Model):
-    item = models.ForeignKey(
-        'auction_management.RuralItem',  # Substituir por uma subclasse concreta de BaseItem
-        on_delete=models.CASCADE,
-        related_name='bids',
-        verbose_name='Item'
-    )
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="bids",
-        verbose_name="Usuário"
-    )
-    amount = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        verbose_name="Valor do Lance"
-    )
-    timestamp = models.DateTimeField(auto_now_add=True, verbose_name="Data e Hora do Lance")
-    is_valid = models.BooleanField(default=True, verbose_name="Lance Válido")
 
-    class Meta:
-        verbose_name = "Lance"
-        verbose_name_plural = "Lances"
-        ordering = ["-timestamp"]
-
-    def __str__(self):
-        return f"Lance de {self.user} no item {self.item} - R$ {self.amount:.2f}"
 
 class RuralItem(BaseItem):
     imagem = models.ImageField(upload_to='rural/', default='default/default_image.jpg')  

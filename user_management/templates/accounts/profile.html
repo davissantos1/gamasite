@@ -1,87 +1,118 @@
-<!DOCTYPE html>
-<html lang="pt-br">
+{% extends 'base.html' %}
 {% load static %}
-{% include '_head.html' %}
+{% load i18n %}
 
-<body>
-    {% include '_header.html' %}
-    
-    <div class="container mt-5">
+{% block content %}
+    <div class="container my-5">
         <div class="row">
             <!-- Menu Lateral -->
             <div class="col-md-3">
-                <div class="list-group">
-                    <!-- Menu suspenso Meus Dados -->
-                    <a href="#" class="list-group-item list-group-item-action bg-dark text-white" data-bs-toggle="collapse" data-bs-target="#meusDadosMenu" aria-expanded="false" aria-controls="meusDadosMenu">
-                        Meus Dados <i class="bi bi-chevron-down float-end"></i>
-                    </a>
-                    <div class="collapse" id="meusDadosMenu">
-                        <a href="{% url 'account_leilao' %}" class="list-group-item list-group-item-action bg-dark text-white ps-4">
-                            Leilões
-                        </a>
-                        <a href="{% url 'account_lance' %}" class="list-group-item list-group-item-action bg-dark text-white ps-4">
-                            Lances
-                        </a>
+                <nav class="card shadow-lg border-0 rounded-3">
+                    <div class="card-header bg-primario text-white">
+                        <h5 class="mb-0"><i class="bi bi-person-circle me-2"></i>Menu do Perfil</h5>
                     </div>
-
-                    <!-- Link Financeiro -->
-                    <a href="{% url 'account_financeiro' %}" class="list-group-item list-group-item-action bg-dark text-white">
-                        Financeiro
-                    </a>
-
-                    <!-- Link Documentos -->
-                    <a href="{% url 'account_documentos' %}" class="list-group-item list-group-item-action bg-dark text-white">
-                        Documentos
-                    </a>
-
-                    <!-- Menu suspenso Configurações -->
-                    <a href="#" class="list-group-item list-group-item-action bg-dark text-white" data-bs-toggle="collapse" data-bs-target="#configuracoesMenu" aria-expanded="false" aria-controls="configuracoesMenu">
-                        Configurações <i class="bi bi-chevron-down float-end"></i>
-                    </a>
-                    <div class="collapse" id="configuracoesMenu">
-                        <a href="{% url 'account_change_password' %}" class="list-group-item list-group-item-action bg-dark text-white ps-4">
-                            Alterar Senha
+                    <div class="list-group list-group-flush">
+                        <!-- Menu suspenso Meus Dados -->
+                        <a href="#" class="list-group-item list-group-item-action text-dark fw-semibold" data-bs-toggle="collapse" data-bs-target="#meusDadosMenu" aria-expanded="false" aria-controls="meusDadosMenu">
+                            <i class="bi bi-folder me-2"></i>Meus Dados
+                            <i class="bi bi-chevron-down float-end"></i>
                         </a>
-                        <a href="{% url 'account_email' %}" class="list-group-item list-group-item-action bg-dark text-white ps-4">
-                            Alterar E-mail
+                        <div class="collapse" id="meusDadosMenu">
+                            <a href="{% url 'account_leilao' %}" class="list-group-item list-group-item-action ps-4 text-secondary">
+                                <i class="bi bi-hammer me-2"></i>Leilões
+                            </a>
+                            <a href="{% url 'account_lance' %}" class="list-group-item list-group-item-action ps-4 text-secondary">
+                                <i class="bi bi-cash-coin me-2"></i>Lances
+                            </a>
+                        </div>
+
+                        <!-- Link Documentos -->
+                        <a href="{% url 'account_documentos' %}" class="list-group-item list-group-item-action text-dark fw-semibold">
+                            <i class="bi bi-file-earmark-text me-2"></i>Documentos
                         </a>
-                        <a href="{% url 'account_edit_profile' %}" class="list-group-item list-group-item-action bg-dark text-white ps-4">
-                            Editar Perfil
+
+                        <!-- Menu suspenso Configurações -->
+                        <a href="#" class="list-group-item list-group-item-action text-dark fw-semibold" data-bs-toggle="collapse" data-bs-target="#configuracoesMenu" aria-expanded="false" aria-controls="configuracoesMenu">
+                            <i class="bi bi-gear me-2"></i>Configurações
+                            <i class="bi bi-chevron-down float-end"></i>
                         </a>
+                        <div class="collapse" id="configuracoesMenu">
+                            <a href="{% url 'account_change_password' %}" class="list-group-item list-group-item-action ps-4 text-secondary">
+                                <i class="bi bi-lock me-2"></i>Alterar Senha
+                            </a>
+                            <a href="{% url 'account_email' %}" class="list-group-item list-group-item-action ps-4 text-secondary">
+                                <i class="bi bi-envelope me-2"></i>Alterar E-mail
+                            </a>
+                            <a href="{% url 'account_edit_profile' %}" class="list-group-item list-group-item-action ps-4 text-secondary">
+                                <i class="bi bi-pencil me-2"></i>Editar Perfil
+                            </a>
+                        </div>
                     </div>
-                </div>
+                </nav>
             </div>
 
             <!-- Seção de Perfil -->
             <div class="col-md-9">
                 <!-- Seção de Introdução -->
-                <div class="row align-items-center main-section full-width mb-4">
-                    <div class="col-md-6 text-center text-md-left">
-                        <span class="d-block" style="color: #4f4f4f;">Bem-vindo ao seu perfil</span>
-                        <h1 class="display-4" style="color: #4f4f4f;">Olá, {{ user.first_name }} {{ user.last_name }}!</h1>
-                        <p class="lead" style="color: #4f4f4f;">Aqui você pode visualizar suas informações e ajustar suas preferências.</p>
-                    </div>
-                    <div class="col-md-6">
-                        <img src="{% static 'pages/img/pexels-photo-5668473.jpeg' %}" alt="Perfil" class="img-fluid rounded-top" style="border-top-left-radius: 30px; border-top-right-radius: 15px; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">
+                <div class="card shadow-lg border-0 mb-4 rounded-3">
+                    <div class="card-body p-4 d-flex align-items-center">
+                        <div class="col-md-8">
+                            <h1 class="display-5 fw-bold text-primario">Olá, {{ user.first_name }} {{ user.last_name }}!</h1>
+                            <p class="text-muted">Bem-vindo ao seu perfil. Aqui você pode visualizar suas informações e ajustar suas preferências.</p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <img src="{% static 'pages/img/pexels-photo-5668473.jpeg' %}" alt="Perfil" class="img-fluid rounded-3 shadow-sm" style="max-width: 100%; height: auto; width: 220px;">
+                        </div>
                     </div>
                 </div>
 
+                <!-- Popup de Aviso de Documentos Pendentes -->
+                {% if documentos_pendentes %}
+                    <div class="modal fade" id="documentosPendentesModal" tabindex="-1" aria-labelledby="documentosPendentesModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="documentosPendentesModalLabel">Aviso</h5>
+                                
+                                </div>
+                                <div class="modal-body">
+                                    <p><strong>{% trans "Você ainda não enviou os seguintes documentos:" %}</strong></p>
+                                    <ul>
+                                        {% for doc in documentos_pendentes %}
+                                            <li>{{ doc }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                    <p>{% trans "Por favor, envie-os para completar seu cadastro." %}</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                                    <a href="{% url 'account_documentos' %}" class="btn btn-primary">Ir para Documentos</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <script>
+                        // Exibir modal automaticamente se houver documentos pendentes
+                        var myModal = new bootstrap.Modal(document.getElementById('documentosPendentesModal'));
+                        myModal.show();
+                    </script>
+                {% endif %}
+
                 <!-- Informações da Conta -->
-                <div class="row mt-5">
-                    <div class="col-md-12">
-                        <h3 class="text-primary" style="color: #4f4f4f;">Informações da Conta</h3>
-                        <ul class="list-group">
+                <div class="card shadow-lg border-0 mb-4 rounded-3">
+                    <div class="card-header bg-light">
+                        <h3 class="mb-0 text-primario"><i class="bi bi-info-circle me-2"></i>Informações da Conta</h3>
+                    </div>
+                    <div class="card-body p-4">
+                        <ul class="list-group list-group-flush">
                             <li class="list-group-item" style="color: #4f4f4f;"><strong>Nome:</strong> {{ user.first_name }} {{ user.last_name }}</li>
                             <li class="list-group-item" style="color: #4f4f4f;"><strong>Email:</strong> {{ user.email }}</li>
-                            <li class="list-group-item" style="color: #4f4f4f;"><strong>Telefone Comercial:</strong> {{ arrematante.telefone_comercial }}</li>
-                            <li class="list-group-item" style="color: #4f4f4f;"><strong>Telefone Cadastrado:</strong> {{ arrematante.telefone_cadastrado }}</li>
+                            <li class="list-group-item" style="color: #4f4f4f;"><strong>Telefone Comercial:</strong> {{ user.arrematante.telefone_comercial }}</li>
+                            <li class="list-group-item" style="color: #4f4f4f;"><strong>Telefone Cadastrado:</strong> {{ user.arrematante.telefone_celular }}</li>
                         </ul>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    {% include '_footer.html' %}
-</body>
-</html>
+{% endblock %}

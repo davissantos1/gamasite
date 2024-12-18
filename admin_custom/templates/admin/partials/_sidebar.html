@@ -38,12 +38,6 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{% url 'admin:user_management_vendedor_changelist' %}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Vendedores</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a href="{% url 'admin:user_management_documento_changelist' %}" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Documentos</p>
@@ -97,31 +91,6 @@
                     </ul>
                 </li>
 
-                <!-- Submenu Configurações -->
-                <li class="nav-item has-treeview">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-cogs"></i>
-                        <p>
-                            Configurações
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="{% url 'admin:categories_auctioncategory_changelist' %}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Categorias</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'admin:auction_management_itemtype_changelist' %}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Tipos de Itens</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-
                 <!-- Submenu Financeiro -->
                 <li class="nav-item has-treeview">
                     <a href="#" class="nav-link">
@@ -142,12 +111,6 @@
                             <a href="#" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Pagamentos</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Integração</p>
                             </a>
                         </li>
                     </ul>
@@ -216,6 +179,31 @@
                             <a href="#" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Clientes</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- Submenu Configurações -->
+                <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-cogs"></i>
+                        <p>
+                            Configurações
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{% url 'admin:categories_auctioncategory_changelist' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Categorias</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'admin:auction_management_itemtype_changelist' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Tipos de Itens</p>
                             </a>
                         </li>
                     </ul>

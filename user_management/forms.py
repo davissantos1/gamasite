@@ -96,15 +96,16 @@ class CustomSignupForm(UserCreationForm):
         return user
 
     def signup(self, request, user):
+        # Salvar as informações do usuário
         user.first_name = self.cleaned_data['first_name']
         user.last_name = self.cleaned_data['last_name']
         user.email = self.cleaned_data['email']
-        user.save()
+        user.save()  # Salva o usuário no banco de dados
 
-        # Verificar se o Arrematante já existe para este usuário
-        arrematante, created = Arrematante.objects.get_or_create(
-            user=user,
-            defaults={
+        # Criar ou atualizar o perfil do Arrematante
+        arrematante, created = Arrematante.objects.update_or_create(
+            user=user,  # Vamos associar o arrematante com o usuário
+            defaults={  # Atualizar ou criar com esses dados
                 'cpf_cnpj': self.cleaned_data['cpf_cnpj'],
                 'cep': self.cleaned_data['cep'],
                 'logradouro': self.cleaned_data['logradouro'],
@@ -120,23 +121,10 @@ class CustomSignupForm(UserCreationForm):
             }
         )
 
-        # Se o Arrematante já existe, atualize os campos
-        if not created:
-            arrematante.cpf_cnpj = self.cleaned_data['cpf_cnpj']
-            arrematante.cep = self.cleaned_data['cep']
-            arrematante.logradouro = self.cleaned_data['logradouro']
-            arrematante.numero = self.cleaned_data['numero']
-            arrematante.complemento = self.cleaned_data['complemento']
-            arrematante.bairro = self.cleaned_data['bairro']
-            arrematante.cidade = self.cleaned_data['cidade']
-            arrematante.estado = self.cleaned_data['estado']
-            arrematante.pais = self.cleaned_data['pais']
-            arrematante.telefone_comercial = self.cleaned_data['telefone_comercial']
-            arrematante.telefone_celular = self.cleaned_data['telefone_celular']
-            arrematante.tipo_cadastro = self.cleaned_data['tipo_cadastro']
-            arrematante.save()
-
+        # Retornar o usuário após a criação ou atualização
         return user
+
+
 
 class ArrematanteEditForm(forms.ModelForm):
     class Meta:
@@ -173,7 +161,22 @@ class DocumentoForm(forms.ModelForm):
     class Meta:
         model = Documento
         fields = ['tipo_documento', 'documento']
-        widgets = {
-            'tipo_documento': forms.Select(attrs={'class': 'form-control'}),
-            'documento': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
-        }
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)  # Recebe o usuário do formulário
+        super().__init__(*args, **kwargs)
+
+        if user and hasattr(user, 'arrematante'):
+            arrematante = user.arrematante
+            if arrematante.tipo_cadastro == 'PF':  # Cliente PF
+                self.fields['tipo_documento'].queryset = Documento.TIPO_DOCUMENTO_CHOICES[:4]
+            elif arrematante.tipo_cadastro == 'PJ':  # Cliente PJ
+                self.fields['tipo_documento'].queryset = Documento.TIPO_DOCUMENTO_CHOICES[3:]
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if not instance.status:
+            instance.status = 'P'  # Define o status como "pendente" ao salvar
+        if commit:
+            instance.save()
+        return instance

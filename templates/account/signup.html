@@ -7,13 +7,13 @@
     <div class="container form-container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-10">
-                <h2 class="text-center mb-4">Cadastro</h2>
+                <h2 class="text-center mb-4 text-primario">Cadastro</h2>
                 <form id="signup-form" method="post" action="{% url 'account_signup' %}">
                     {% csrf_token %}
-
+                    
                     <!-- Seção: Informações Pessoais -->
                     <div class="form-section mb-4 p-4 rounded bg-light shadow-sm">
-                        <h4 class="mb-3">Informações Pessoais</h4>
+                        <h4 class="text-primario mb-3">Informações Pessoais</h4>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -39,11 +39,6 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    {{ form.username.label_tag }}
-                                    {{ form.username }}
-                                    <small class="text-danger">{{ form.username.errors }}</small>
-                                </div>
-                                <div class="form-group">
                                     {{ form.telefone_comercial.label_tag }}
                                     {{ form.telefone_comercial }}
                                     <small class="text-danger">{{ form.telefone_comercial.errors }}</small>
@@ -64,14 +59,14 @@
 
                     <!-- Seção: Endereço -->
                     <div class="form-section mb-4 p-4 rounded bg-light shadow-sm">
-                        <h4 class="mb-3">Endereço</h4>
+                        <h4 class="text-primario mb-3">Endereço</h4>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     {{ form.cep.label_tag }}
                                     <div class="input-group">
                                         {{ form.cep }}
-                                        <button type="button" id="id_btn_search_cep" class="btn btn-info">Buscar Endereço</button>
+                                        <button type="button" id="id_btn_search_cep" class="btn-primario btn-info">Buscar</button>
                                     </div>
                                     <small class="text-danger">{{ form.cep.errors }}</small>
                                 </div>
@@ -118,9 +113,14 @@
 
                     <!-- Seção: Informações da Conta -->
                     <div class="form-section mb-4 p-4 rounded bg-light shadow-sm">
-                        <h4 class="mb-3">Informações da Conta</h4>
+                        <h4 class="text-primario mb-3">Informações da Conta</h4>
                         <div class="row">
                             <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form.username.label_tag }}
+                                    {{ form.username }}
+                                    <small class="text-danger">{{ form.username.errors }}</small>
+                                </div>
                                 <div class="form-group">
                                     {{ form.password1.label_tag }}
                                     {{ form.password1 }}
@@ -136,7 +136,7 @@
                     </div>
 
                     <!-- Botão de Envio -->
-                    <button type="submit" class="btn btn-success btn-block mt-4">Cadastrar</button>
+                    <button type="submit" class="btn-primario  btn-block mt-4 py-2">Cadastrar</button>
                 </form>
             </div>
         </div>
@@ -147,6 +147,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.15/jquery.mask.min.js"></script>
     <script>
         $(document).ready(function() {
+            // Máscara para telefone celular
+            $('#id_telefone_celular').mask('(00) 00000-0000');
+
+            // Máscara para telefone comercial
+            $('#id_telefone_comercial').mask('(00) 0000-0000');
+
+            // Máscara para CEP
+            $('#id_cep').mask('00000-000');
+
             // Máscara de CPF/CNPJ
             $('#id_cpf_cnpj').on('input', function() {
                 var val = $(this).val().replace(/\D/g, ''); // Remove caracteres não numéricos

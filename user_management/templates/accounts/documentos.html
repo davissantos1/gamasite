@@ -1,6 +1,5 @@
-<!-- templates/accounts/documentos.html -->
 {% extends "base.html" %}
-{% load i18n %}  <!-- Carrega a tag 'trans' para traduções -->
+{% load i18n custom_filters %}  <!-- Carregar o filtro customizado -->
 
 {% block head_title %}
     {% trans "Meus Documentos" %}
@@ -9,7 +8,7 @@
 {% block content %}
     <div class="container form-container mt-5">
         <div class="row justify-content-center">
-            <div class="col-md-8">
+            <div class="col-md-10">  <!-- Card maior -->
                 <div class="card shadow-sm rounded-lg">
                     <div class="card-body">
                         <h2 class="text-center text-primary mb-4">{% trans "Meus Documentos" %}</h2>
@@ -21,6 +20,8 @@
                                     <tr>
                                         <th>{% trans "Tipo de Documento" %}</th>
                                         <th>{% trans "Arquivo" %}</th>
+                                        <th>{% trans "Nome do Arquivo" %}</th>
+                                        <th>{% trans "Status" %}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -28,6 +29,16 @@
                                         <tr>
                                             <td>{{ documento.get_tipo_documento_display }}</td>
                                             <td><a href="{{ documento.documento.url }}" target="_blank">{% trans "Ver Documento" %}</a></td>
+                                            <td><small>{{ documento.documento.name|get_original_filename }}</small></td>  <!-- Nome do arquivo sem caminho e código -->
+                                            <td>
+                                                {% if documento.status == 'P' %}
+                                                    <span class="badge bg-warning">{% trans "Pendente" %}</span>
+                                                {% elif documento.status == 'A' %}
+                                                    <span class="badge bg-success">{% trans "Aprovado" %}</span>
+                                                {% elif documento.status == 'R' %}
+                                                    <span class="badge bg-danger">{% trans "Rejeitado" %}</span>
+                                                {% endif %}
+                                            </td>
                                         </tr>
                                     {% endfor %}
                                 </tbody>
@@ -36,12 +47,48 @@
                             <p>{% trans "Você ainda não enviou nenhum documento." %}</p>
                         {% endif %}
 
-                        <h4>{% trans "Enviar Novo Documento" %}</h4>
-                        <form method="POST" enctype="multipart/form-data">
-                            {% csrf_token %}
-                            {{ form.as_p }}
-                            <button type="submit" class="btn btn-dark btn-block mt-3">{% trans "Enviar Documento" %}</button>
-                        </form>
+                        {% if documentos|length == 0 or documentos.last.status == 'R' or documentos.last.status == 'P' %}
+                            <h4>{% trans "Enviar Novo Documento" %}</h4>
+
+                            {% if form.tipo_documento.value %}
+                                {% with form.tipo_documento.value as tipo_documento_selecionado %}
+                                    {% if documentos %}
+                                        {% for documento in documentos %}
+                                            {% if documento.tipo_documento == tipo_documento_selecionado and documento.status != 'R' %}
+                                                <div class="alert alert-danger">
+                                                    {% trans "Você já enviou este documento e ele está pendente ou aprovado. Você só pode enviar um novo documento deste tipo se o anterior for rejeitado." %}
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endwith %}
+                            {% endif %}
+
+                            <form method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+
+                                <div class="form-group">
+                                    <label for="id_tipo_documento">{% trans "Tipo de Documento" %}</label>
+                                    <select name="tipo_documento" class="form-control" id="id_tipo_documento">
+                                        {% for choice in form.tipo_documento.field.choices %}
+                                            {% if choice.0 in tipos_documentos_permitidos %}
+                                                <option value="{{ choice.0 }}" {% if form.tipo_documento.value == choice.0 %}selected{% endif %}>
+                                                    {{ choice.1 }}
+                                                </option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="id_documento">{% trans "Documento" %}</label>
+                                    {{ form.documento }}
+                                </div>
+
+                                <button type="submit" class="btn btn-dark btn-block mt-3">{% trans "Enviar Documento" %}</button>
+                            </form>
+                        {% endif %}
+
                     </div>
                 </div>
             </div>

@@ -6,16 +6,16 @@
 
 <body>
     {% include '_header.html' %}
-    
+
+    <!-- Seção de Introdução -->
     <div class="container mt-5">
-        <!-- Seção de Introdução -->
-        <div class="row align-items-center main-section full-width">
-            <div class="col-md-6 text-center text-md-left mb-4 mb-md-0">
+        <div class="row align-items-center main-section">
+            <div class="col-md-6 text-center text-md-left">
                 <span class="d-block text-secondary">Leilão de Veículos</span>
                 <h1 class="display-4">Veículos Disponíveis para Leilão</h1>
                 <p class="lead">Confira os veículos que estão sendo leiloados e suas características detalhadas.</p>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6 text-center">
                 <img src="{% static 'pages/img/pexels-photo-5668473.jpeg' %}" alt="Veículos" class="img-fluid">
             </div>
         </div>
@@ -23,23 +23,28 @@
 
     <!-- Lista de Veículos -->
     <div class="container mt-5">
-        <h2 class="h3">Veículos em Leilão</h2>
+        <h2 class="h3 mb-4">Veículos em Leilão</h2>
         <div class="row">
             {% for veiculo in veiculos %}
-            <div class="col-md-4">
-                <div class="card mb-4">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card shadow-sm h-100">
                     <img src="{{ veiculo.imagem.url }}" alt="{{ veiculo.modelo }}" class="card-img-top">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ veiculo.modelo }}</h5>
-                        <p class="card-text">Ano: {{ veiculo.ano }}</p>
-                        <p class="card-text">Marca: {{ veiculo.marca }}</p>
-                        <p class="card-text">Preço estimado: R$ {{ veiculo.preco_estima|floatformat:2 }}</p>
-                        <a href="{% url 'category_veiculos_detail' veiculo.id %}" class="btn btn-secondary btn-block">Ver Detalhes</a>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ veiculo.nome }}</h5>
+                        <p class="card-text mb-1"><strong>Ano:</strong> {{ veiculo.fabricacao }}</p>
+                        <p class="card-text mb-1"><strong>Modelo</strong> {{ veiculo.modelo }}</p>
+                        <p class="card-text mb-1"><strong>Marca:</strong> {{ veiculo.marca }}</p>
+                        <p class="card-text"><strong>Preço estimado:</strong> R$ {{ veiculo.fipe|floatformat:2 }}</p>
+                        <div class="mt-auto">
+                            <a href="#" class="btn btn-primary btn-block">Ver Detalhes</a>
+                        </div>
                     </div>
                 </div>
             </div>
             {% empty %}
-            <p class="text-center">Nenhum veículo disponível no momento.</p>
+            <div class="col-12">
+                <p class="text-center text-muted">Nenhum veículo disponível no momento.</p>
+            </div>
             {% endfor %}
         </div>
     </div>

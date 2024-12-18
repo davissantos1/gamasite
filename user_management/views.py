@@ -28,18 +28,30 @@ def signup_view(request):
     return render(request, 'signup.html', {'form': form})
 
 
-@login_required
 def profile_view(request):
-    """
-    Exibe informações do perfil do usuário logado.
-    """
-    try:
-        arrematante = request.user.arrematante  # Tenta acessar o perfil do arrematante
-    except Arrematante.DoesNotExist:
-        arrematante = None  # Caso não exista perfil, retorna None
+    documentos_pendentes = []
+
+    if request.user.is_authenticated:
+        arrematante = request.user.arrematante
+
+        if arrematante.tipo_cadastro == 'PF':
+            if not arrematante.documentos.filter(tipo_documento='identidade').exists():
+                documentos_pendentes.append('Identidade (RG, CNH ou Passaporte)')
+            if not arrematante.documentos.filter(tipo_documento='residencia').exists():
+                documentos_pendentes.append('Comprovante de residência')
+            if not arrematante.documentos.filter(tipo_documento='selfie').exists():
+                documentos_pendentes.append('Selfie')
+
+        elif arrematante.tipo_cadastro == 'PJ':
+            if not arrematante.documentos.filter(tipo_documento='contrato_social').exists():
+                documentos_pendentes.append('Contrato Social')
+            if not arrematante.documentos.filter(tipo_documento='residencia').exists():
+                documentos_pendentes.append('Comprovante de residência')
+            if not arrematante.documentos.filter(tipo_documento='selfie').exists():
+                documentos_pendentes.append('Selfie')
 
     return render(request, 'accounts/profile.html', {
-        'arrematante': arrematante,
+        'documentos_pendentes': documentos_pendentes,
     })
 
 
@@ -118,33 +130,50 @@ def lances_view(request):
     })
 
 
+
 @login_required
 def documentos_view(request):
-    try:
-        arrematante = request.user.arrematante
-    except Arrematante.DoesNotExist:
-        arrematante = None
+    user = request.user
+    arrematante = user.arrematante if hasattr(user, 'arrematante') else None
     
-    documentos = arrematante.documentos.all() if arrematante else []
+    # Defina os tipos de documentos permitidos com base no tipo de arrematante
+    if arrematante and arrematante.tipo_cadastro == 'PF':
+        tipos_documentos_permitidos = ['RG', 'CNH', 'PASSAPORTE', 'SELFIE', 'COMPROVANTE_RESIDENCIA']
+    elif arrematante and arrematante.tipo_cadastro == 'PJ':
+        tipos_documentos_permitidos = ['COMPROVANTE_RESIDENCIA', 'CONTRATO_SOCIAL', 'SELFIE']
+    else:
+        tipos_documentos_permitidos = []
+
+    # Obtenha os documentos do arrematante
+    documentos = Documento.objects.filter(arrematante=arrematante)
 
     if request.method == 'POST':
         form = DocumentoForm(request.POST, request.FILES)
         if form.is_valid():
             documento = form.save(commit=False)
-            if arrematante:
-                documento.arrematante = arrematante
-            if request.user.vendedor:
-                documento.vendedor = request.user.vendedor
+            # Verifica se há documentos anteriores
+            documentos_existentes = Documento.objects.filter(arrematante=arrematante, tipo_documento=documento.tipo_documento)
+            for doc in documentos_existentes:
+                if doc.status == 'P':  # Se houver documento pendente, não permita o envio
+                    return render(request, 'accounts/documentos.html', {
+                        'form': form,
+                        'documentos': documentos,
+                        'tipos_documentos_permitidos': tipos_documentos_permitidos,
+                        'arrematante': arrematante,
+                        'erro': 'Você já possui um documento pendente para esse tipo.',
+                    })
+            documento.arrematante = arrematante
             documento.save()
-            return redirect('documentos')  # Redireciona para a página de documentos
+            return redirect('account_documentos')  # Redirecionar após o envio do documento
     else:
         form = DocumentoForm()
 
     return render(request, 'accounts/documentos.html', {
         'documentos': documentos,
+        'tipos_documentos_permitidos': tipos_documentos_permitidos,
+        'arrematante': arrematante,
         'form': form,
     })
-
 
 
 @login_required

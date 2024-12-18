@@ -8,6 +8,7 @@ from calendar import Calendar
 from django.contrib.auth.decorators import login_required
 from auction_management.models import Auction
 from datetime import timedelta
+from payment.models import Pagamento
 
 
 def index(request):
@@ -94,3 +95,15 @@ def live_auctions_view(request):
         'live_auctions': live_auctions,
         'scheduled_auctions': scheduled_auctions,
     })
+
+
+
+def financeiro(request):
+    pagamentos_pendentes = Pagamento.objects.filter(status='pendente')
+    pagamentos_realizados = Pagamento.objects.filter(status='pago')
+
+    context = {
+        'pagamentos_pendentes': pagamentos_pendentes,
+        'pagamentos_realizados': pagamentos_realizados,
+    }
+    return render(request, 'financeiro/financeiro.html', context)

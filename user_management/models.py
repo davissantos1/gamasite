@@ -11,35 +11,59 @@ class Documento(models.Model):
         ('PASSAPORTE', 'Passaporte'),
         ('COMPROVANTE_RESIDENCIA', 'Comprovante de Residência'),
         ('CONTRATO_SOCIAL', 'Contrato Social'),
+        ('SELFIE', 'Selfie'),  # Adicionando a opção "Selfie"
+    ]
+
+    STATUS_CHOICES = [
+        ('P', 'Pendente'),
+        ('A', 'Aprovado'),
+        ('R', 'Rejeitado'),
     ]
 
     arrematante = models.ForeignKey(
         'Arrematante', related_name='documentos', on_delete=models.CASCADE, null=True, blank=True
     )
-    vendedor = models.ForeignKey(
-        'Vendedor', related_name='documentos', on_delete=models.CASCADE, null=True, blank=True
-    )
     tipo_documento = models.CharField(max_length=50, choices=TIPO_DOCUMENTO_CHOICES)
     documento = models.FileField(upload_to='documentos/', blank=False, null=False)
     data_upload = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=1, choices=STATUS_CHOICES, default='P')  # Campo de status
 
     def clean(self):
-        # Exemplo: Verificar o tamanho máximo do arquivo (10 MB)
+        # Verificar o tamanho máximo do arquivo (10 MB)
         max_file_size = 10 * 1024 * 1024
         if self.documento and self.documento.size > max_file_size:
             raise ValidationError("O tamanho do arquivo não pode exceder 10 MB.")
-        # Exemplo: Verificar extensões permitidas
+        
+        # Verificar extensões permitidas
         valid_extensions = ['.pdf', '.jpg', '.png']
         if self.documento and not any(self.documento.name.endswith(ext) for ext in valid_extensions):
             raise ValidationError(f"Permitido apenas arquivos: {', '.join(valid_extensions)}")
 
+    def clean_user_document(self):
+        # Validar qual tipo de usuário está enviando o documento e garantir que os documentos sejam válidos
+        if self.arrematante:
+            if self.arrematante.tipo_cadastro == 'PF':
+                # Para Pessoa Física (PF), exige RG, CNH, Passaporte, Comprovante de Residência ou Selfie
+                if self.tipo_documento == 'COMPROVANTE_RESIDENCIA':
+                    return  # Comprovante de Residência é permitido para PF
+                elif self.tipo_documento not in ['RG', 'CNH', 'PASSAPORTE', 'SELFIE']:
+                    raise ValidationError('Para Pessoa Física (PF), é necessário enviar RG, CNH, Passaporte, Comprovante de Residência ou Selfie.')
+            elif self.arrematante.tipo_cadastro == 'PJ':
+                # Para Pessoa Jurídica (PJ), exige Contrato Social, Comprovante de Residência ou Selfie
+                if self.tipo_documento in ['COMPROVANTE_RESIDENCIA', 'CONTRATO_SOCIAL', 'SELFIE']:
+                    return  # Comprovante de Residência, Contrato Social e Selfie são permitidos para PJ
+                raise ValidationError('Para Pessoa Jurídica (PJ), é necessário enviar Contrato Social, Comprovante de Residência ou Selfie.')
+
+    def save(self, *args, **kwargs):
+        self.clean_user_document()  # Chama a validação do documento antes de salvar
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return f"{self.get_tipo_documento_display()} - {self.arrematante.user.username if self.arrematante else self.vendedor.user.username}"
+        return f"{self.get_tipo_documento_display()} - {self.arrematante.user.username}"
 
     class Meta:
         verbose_name = "Documento"
         verbose_name_plural = "Documentos"
-
 
 
 class Arrematante(models.Model):
@@ -69,34 +93,9 @@ class Arrematante(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.get_tipo_cadastro_display()}"
 
-
-class Vendedor(models.Model):
-    TIPO_CADASTRO_CHOICES = [
-        ('PF', 'Pessoa Física'),
-        ('PJ', 'Pessoa Jurídica'),
-    ]
-
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="vendedor")
-    tipo_cadastro = models.CharField(max_length=2, choices=TIPO_CADASTRO_CHOICES, verbose_name="Tipo de Cadastro")
-    cpf_cnpj = models.CharField(max_length=18, verbose_name="CPF/CNPJ")
-    logradouro = models.CharField(max_length=255, verbose_name="Logradouro")
-    numero = models.CharField(max_length=10, verbose_name="Número")
-    complemento = models.CharField(max_length=255, blank=True, null=True, verbose_name="Complemento")
-    bairro = models.CharField(max_length=100, verbose_name="Bairro")
-    cidade = models.CharField(max_length=100, verbose_name="Cidade")
-    estado = models.CharField(max_length=50, verbose_name="Estado")
-    cep = models.CharField(max_length=9, verbose_name="CEP")
-    pais = models.CharField(max_length=50, verbose_name="País")
-    telefone_comercial = models.CharField(max_length=15, blank=True, null=True, verbose_name="Telefone Comercial")
-
-    tipo_cadastro = models.CharField(
-        max_length=2,
-        choices=TIPO_CADASTRO_CHOICES,
-        default='PF',
-    )
-
-    def __str__(self):
-        return f"{self.user.username} - {self.get_tipo_cadastro_display()}"
+    class Meta:
+        verbose_name = "Arrematante"
+        verbose_name_plural = "Arrematantes"
 
 
 class Admin(models.Model):
@@ -107,19 +106,47 @@ class Admin(models.Model):
     def __str__(self):
         return f"Admin: {self.user.username}"
 
+    class Meta:
+        verbose_name = "Admin"
+        verbose_name_plural = "Admins"
+
 
 # Sinais para criar perfis automaticamente após a criação de um usuário
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
-        # Determine aqui qual tipo de perfil criar, baseado em lógica de negócios
-        pass
+        # Criar perfil de Arrematante
+        if hasattr(instance, "arrematante") and not instance.arrematante:
+            arrematante = Arrematante.objects.create(
+                user=instance,
+                cpf_cnpj='',  # Campos vazios ou com valores padrão podem ser definidos
+                cep='',
+                logradouro='',
+                numero='',
+                complemento='',
+                bairro='',
+                cidade='',
+                estado='',
+                pais='',
+                telefone_comercial='',
+                telefone_celular='',
+                tipo_cadastro='',  # Define um tipo padrão (pode ser PF ou PJ)
+            )
+            arrematante.save()
+
+        # Criar perfil de Admin
+        elif hasattr(instance, "admin") and not instance.admin:
+            admin = Admin.objects.create(
+                user=instance,
+                setor='',  # Pode preencher com dados padrão
+                telefone='',  # Pode preencher com dados padrão
+            )
+            admin.save()
+
 
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
     if hasattr(instance, "arrematante"):
         instance.arrematante.save()
-    elif hasattr(instance, "vendedor"):
-        instance.vendedor.save()
     elif hasattr(instance, "admin"):
         instance.admin.save()
