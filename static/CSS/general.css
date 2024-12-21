@@ -179,15 +179,23 @@ body {
     margin-bottom: 30px;
     border: none;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .central-section .card-img-top {
-    height: 200px;
-    object-fit: cover;
+    height: 200px; /* Define uma altura fixa para consistência */
+    object-fit: cover; /* Garante que as imagens fiquem ajustadas sem distorção */
 }
 
 .central-section .card-body {
     padding: 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .central-section .card-title {
@@ -209,15 +217,12 @@ body {
 .footer {
     background-color: var(--cor-accent);
     color: white;
+    padding: 0;
 }
 
-.footer a {
-    color: white;
-    text-decoration: none;
-}
-
-.footer a:hover {
-    text-decoration: underline;
+.footer .text-center {
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 10px 0;
 }
 
 .footer h5 {
@@ -230,7 +235,52 @@ body {
     color: #b1b1b1;
 }
 
-.footer .text-center {
-    background-color: rgba(0, 0, 0, 0.2);
-    padding: 1rem 0;
+.footer a {
+    color: white;
+    text-decoration: none;
+}
+
+.footer a:hover {
+    text-decoration: underline;
+}
+
+/* Estilos para o Carrossel de Itens em Destaque */
+.itens-destaque {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.itens .carousel-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    overflow: visible; /* Permite que o conteúdo seja renderizado completamente */
+}
+
+.itens .carousel-item {
+    display: flex; /* Garante que os itens no carrossel se alinhem corretamente */
+    flex-wrap: wrap; /* Permite múltiplas linhas em uma única página do carrossel */
+    justify-content: center; /* Centraliza os itens no carrossel */
+}
+
+.itens .col-md-4 {
+    flex: 0 0 33%; /* Exibe 3 itens por linha em telas grandes */
+    max-width: 33%;
+}
+
+.itens .col-12 {
+    flex: 0 0 100%; /* Exibe 1 item por linha em telas pequenas */
+    max-width: 100%;
+}
+
+/* Botões de navegação do Carrossel */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    background-color: var(--cor-primaria); /* Altere a cor dos ícones */
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+    z-index: 2; /* Garante que os controles fiquem sobre os itens do carrossel */
 }

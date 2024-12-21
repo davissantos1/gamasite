@@ -28,7 +28,7 @@
                                     {% for documento in documentos %}
                                         <tr>
                                             <td>{{ documento.get_tipo_documento_display }}</td>
-                                            <td><a href="{{ documento.documento.url }}" target="_blank">{% trans "Ver Documento" %}</a></td>
+                                            <td><a href="{% url 'serve_documento' documento.id %}" target="_blank">{% trans "Ver Documento" %}</a></td>
                                             <td><small>{{ documento.documento.name|get_original_filename }}</small></td>  <!-- Nome do arquivo sem caminho e código -->
                                             <td>
                                                 {% if documento.status == 'P' %}

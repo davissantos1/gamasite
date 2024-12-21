@@ -41,5 +41,8 @@ cert.key
 # Ignore media directory (uploaded files)
 media/
 
+# Ignore media directory (uploaded files)
+protected_documents/
+
 # Ignore editais (publications or documents directory)
 editais/

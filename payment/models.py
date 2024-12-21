@@ -1,29 +1,41 @@
 from django.db import models
 from django.conf import settings
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 
 class Bid(models.Model):
     """
     Modelo representando os lances feitos no sistema de leilão.
     """
-    item = models.ForeignKey(
-        'auction_management.RuralItem',  # Substituir por uma subclasse concreta de BaseItem
+    # Campo para relacionar com qualquer modelo concreto
+    content_type = models.ForeignKey(
+        ContentType,
         on_delete=models.CASCADE,
         related_name='bids',
-        verbose_name='Item'
+        verbose_name='Tipo de Item'
     )
+    object_id = models.PositiveIntegerField(verbose_name='ID do Item')
+    item = GenericForeignKey('content_type', 'object_id')
+
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="bids",
-        verbose_name="Usuário"
+        verbose_name="Usuário Arrematante"
     )
     amount = models.DecimalField(
         max_digits=10,
         decimal_places=2,
         verbose_name="Valor do Lance"
     )
-    timestamp = models.DateTimeField(auto_now_add=True, verbose_name="Data e Hora do Lance")
-    is_valid = models.BooleanField(default=True, verbose_name="Lance Válido")
+    timestamp = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Data e Hora do Lance"
+    )
+    is_valid = models.BooleanField(
+        default=True,
+        verbose_name="Lance Válido"
+    )
 
     class Meta:
         verbose_name = "Lance"
@@ -33,7 +45,15 @@ class Bid(models.Model):
     def __str__(self):
         return f"Lance de {self.user} no item {self.item} - R$ {self.amount:.2f}"
 
-class Pagamento(models.Model):
+    def get_item_instance(self):
+        """
+        Retorna a instância concreta do item associado usando GenericForeignKey.
+        """
+        return self.item
+
+
+
+class Payment(models.Model):
     """
     Modelo representando os pagamentos realizados ou pendentes.
     """
@@ -49,39 +69,16 @@ class Pagamento(models.Model):
         related_name="pagamentos",
         verbose_name="Cliente Arrematante"
     )
-    # ForeignKeys serão importadas mais tarde
-    rural_item = models.ForeignKey(
-        'auction_management.RuralItem',
+    # Relacionamento genérico com o modelo de item
+    content_type = models.ForeignKey(
+        ContentType,
         on_delete=models.CASCADE,
         related_name='pagamentos',
-        verbose_name="Item Rural",
-        null=True,
-        blank=True
+        verbose_name='Tipo de Item'
     )
-    real_estate = models.ForeignKey(
-        'auction_management.RealEstate',
-        on_delete=models.CASCADE,
-        related_name='pagamentos',
-        verbose_name="Imóvel",
-        null=True,
-        blank=True
-    )
-    vehicle = models.ForeignKey(
-        'auction_management.Vehicle',
-        on_delete=models.CASCADE,
-        related_name='pagamentos',
-        verbose_name="Veículo",
-        null=True,
-        blank=True
-    )
-    other_goods = models.ForeignKey(
-        'auction_management.OtherGoods',
-        on_delete=models.CASCADE,
-        related_name='pagamentos',
-        verbose_name="Outro Bem",
-        null=True,
-        blank=True
-    )
+    object_id = models.PositiveIntegerField(verbose_name='ID do Item')
+    item = GenericForeignKey('content_type', 'object_id')
+
     amount = models.DecimalField(
         max_digits=10,
         decimal_places=2,
@@ -115,16 +112,8 @@ class Pagamento(models.Model):
         return f"Pagamento de {self.user} - R$ {self.amount:.2f} - Status: {self.get_status_display()}"
 
     @property
-    def item_associado(self):
+    def get_item_instance(self):
         """
-        Retorna o item associado ao pagamento.
+        Retorna a instância concreta do item associado usando GenericForeignKey.
         """
-        if self.rural_item:
-            return self.rural_item
-        elif self.real_estate:
-            return self.real_estate
-        elif self.vehicle:
-            return self.vehicle
-        elif self.other_goods:
-            return self.other_goods
-        return "Nenhum item associado"
+        return self.item

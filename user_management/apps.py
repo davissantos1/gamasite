@@ -6,4 +6,7 @@ class UserManagementConfig(AppConfig):
     name = 'user_management'
 
     def ready(self):
-        import user_management.signals
+        """
+        Método chamado quando a aplicação é carregada. Importa os sinais para garantir que eles sejam registrados.
+        """
+        from . import signals  # Importação explícita para registrar os sinais

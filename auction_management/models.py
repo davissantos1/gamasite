@@ -4,7 +4,6 @@ from django.conf import settings
 from datetime import timedelta
 import uuid
 from categories.models import AuctionCategory
-from payment.models import Bid
 
 def default_auction_time():
     """Retorna a data e hora atual."""
@@ -17,6 +16,66 @@ def generate_auction_code(auction):
 def generate_item_code(item):
     """Gera o código do item com base no nome do item e números aleatórios."""
     return f"{item.nome.replace(' ', '_').upper()}_{uuid.uuid4().hex[:8].upper()}"
+
+def generate_item_image_path(instance, filename):
+    """Gera o caminho dinâmico para upload das imagens do item."""
+    if instance.vehicle:
+        leilao_codigo = instance.vehicle.leilao.codigo_leilao if instance.vehicle.leilao else "sem_leilao"
+        item_codigo = instance.vehicle.codigo_item
+        tipo_item = "veiculo"
+    elif instance.real_estate:
+        leilao_codigo = instance.real_estate.leilao.codigo_leilao if instance.real_estate.leilao else "sem_leilao"
+        item_codigo = instance.real_estate.codigo_item
+        tipo_item = "imovel"
+    elif instance.rural_item:
+        leilao_codigo = instance.rural_item.leilao.codigo_leilao if instance.rural_item.leilao else "sem_leilao"
+        item_codigo = instance.rural_item.codigo_item
+        tipo_item = "rural"
+    elif instance.other_goods:
+        leilao_codigo = instance.other_goods.leilao.codigo_leilao if instance.other_goods.leilao else "sem_leilao"
+        item_codigo = instance.other_goods.codigo_item
+        tipo_item = "outros_bens"
+    else:
+        leilao_codigo = "sem_leilao"
+        item_codigo = "sem_codigo_item"
+        tipo_item = "sem_tipo"
+
+    return f"imagens/{tipo_item}/{leilao_codigo}/{item_codigo}/{filename}"
+
+def generate_item_thumb_path(instance, filename):
+    """Gera o caminho dinâmico para o upload de thumbnails."""
+    if isinstance(instance, Vehicle):
+        leilao_codigo = instance.leilao.codigo_leilao if instance.leilao else "sem_leilao"
+        item_codigo = instance.codigo_item
+        tipo_item = "veiculo"
+    elif isinstance(instance, RealEstate):
+        leilao_codigo = instance.leilao.codigo_leilao if instance.leilao else "sem_leilao"
+        item_codigo = instance.codigo_item
+        tipo_item = "imovel"
+    elif isinstance(instance, RuralItem):
+        leilao_codigo = instance.leilao.codigo_leilao if instance.leilao else "sem_leilao"
+        item_codigo = instance.codigo_item
+        tipo_item = "rural"
+    elif isinstance(instance, OtherGoods):
+        leilao_codigo = instance.leilao.codigo_leilao if instance.leilao else "sem_leilao"
+        item_codigo = instance.codigo_item
+        tipo_item = "outros_bens"
+    else:
+        leilao_codigo = "sem_leilao"
+        item_codigo = "sem_codigo_item"
+        tipo_item = "sem_tipo"
+
+    return f"thumbnail/{tipo_item}/{leilao_codigo}/{item_codigo}/{filename}"
+
+
+def generate_auction_thumb_path(instance, filename):
+    """Gera o caminho dinâmico para o upload de thumbnails."""
+    if isinstance(instance, Auction):
+        leilao_codigo = instance.codigo_leilao 
+    else:
+        leilao_codigo = "sem_codigo"
+
+    return f"thumbnail/leilao/{leilao_codigo}/{filename}"
 
 
 class Auction(models.Model):
@@ -47,7 +106,7 @@ class Auction(models.Model):
         default=0,
         verbose_name="Quantidade de Lotes"
     )
-    imagem = models.ImageField(upload_to='leiloes/', default='default/default_image.jpg')
+    thumbnail = models.ImageField(upload_to=generate_auction_thumb_path, default='default/default_image.jpg')
     documento_editais = models.FileField(upload_to='editais/', null=True, blank=True, verbose_name="Documento Edital (PDF)")
 
     @property
@@ -85,6 +144,10 @@ class Auction(models.Model):
 
     def __str__(self):
         return f"Leilão {self.codigo_leilao}"
+    
+    class Meta:
+        verbose_name = "Leilão"
+        verbose_name_plural = "Leilões"
 
 
 class BaseItem(models.Model):
@@ -144,6 +207,12 @@ class BaseItem(models.Model):
         default=False,
         verbose_name="Item Destacado"
     )
+    bids = models.ManyToManyField(
+        'payment.Bid',
+        related_name='base_items',  # Ajustar o related_name para ser único
+        verbose_name='Lances',
+        blank=True
+    )
 
     def save(self, *args, **kwargs):
         if not self.codigo_item:
@@ -182,10 +251,23 @@ class BaseItem(models.Model):
     class Meta:
         abstract = True
 
-
 class ItemImage(models.Model):
-    imagem = models.ImageField(upload_to='media/itens/', verbose_name="Imagem do Item")
+    imagem = models.ImageField(upload_to=generate_item_image_path, verbose_name="Imagem do Item")
     descricao = models.CharField(max_length=255, blank=True, null=True, verbose_name="Descrição da Imagem")
+
+    # Relacionamento com diferentes modelos
+    vehicle = models.ForeignKey(
+        'Vehicle', on_delete=models.CASCADE, related_name='vehicle_images', null=True, blank=True, verbose_name="Veículo"
+    )
+    real_estate = models.ForeignKey(
+        'RealEstate', on_delete=models.CASCADE, related_name='real_estate_images', null=True, blank=True, verbose_name="Imóvel"
+    )
+    rural_item = models.ForeignKey(
+        'RuralItem', on_delete=models.CASCADE, related_name='rural_item_images', null=True, blank=True, verbose_name="Item Rural"
+    )
+    other_goods = models.ForeignKey(
+        'OtherGoods', on_delete=models.CASCADE, related_name='other_goods_images', null=True, blank=True, verbose_name="Outros Bens"
+    )
 
     def __str__(self):
         return self.descricao if self.descricao else f"Imagem {self.id}"
@@ -193,6 +275,7 @@ class ItemImage(models.Model):
     class Meta:
         verbose_name = "Imagem do Item"
         verbose_name_plural = "Imagens dos Itens"
+
 
 class ItemType(models.Model):
     VEICULO = 'Veículo'
@@ -219,18 +302,20 @@ class ItemType(models.Model):
         verbose_name = "Tipo de Item"
         verbose_name_plural = "Tipos de Itens"
 
-
-
-
 class RuralItem(BaseItem):
-    imagem = models.ImageField(upload_to='rural/', default='default/default_image.jpg')  
+    thumbnail = models.ImageField(upload_to=generate_item_thumb_path, default='default/default_image.jpg')  
     origem = models.CharField(max_length=50, default="Rural", verbose_name="Origem")
-    imagens = models.ManyToManyField('ItemImage', related_name='rural_items', verbose_name="Imagens do Item Rural")
-
+    imagens = models.ManyToManyField('ItemImage', related_name='rural_item_img', verbose_name="Imagens do Item Rural")
+    bids = models.ManyToManyField(
+        'payment.Bid',
+        related_name='rural_item_bids',  # Altere para um nome único
+        verbose_name='Lances',
+        blank=True
+    )
     leilao = models.ForeignKey(
         'Auction',
         on_delete=models.CASCADE,
-        related_name='rural_items',  # Unique related name
+        related_name='rural_items',  # Ajustado para ser único
         verbose_name='Leilão',
         null=True,
         blank=True
@@ -240,32 +325,40 @@ class RuralItem(BaseItem):
         return f"Item Rural - {self.tipo_item}"
     
     class Meta:
-        pass
+        verbose_name = "Item Rural"
+        verbose_name_plural = "Itens Rurais"
 
 
 class RealEstate(BaseItem):
-    imagem = models.ImageField(upload_to='imoveis/', default='default/default_image.jpg')  
-    imagens = models.ManyToManyField('ItemImage', related_name='real_estates', verbose_name="Imagens do Imóvel")
+    thumbnail = models.ImageField(upload_to=generate_item_thumb_path, default='default/default_image.jpg')  
+    imagens = models.ManyToManyField('ItemImage', related_name='real_estate_img', verbose_name="Imagens do Imóvel")
     quartos = models.IntegerField(verbose_name="Quartos")
     metragem = models.FloatField(verbose_name="Metragem")
     localizacao = models.CharField(max_length=255, verbose_name="Localização")
     estado_imovel = models.CharField(max_length=50, verbose_name="Estado do Imóvel")
-
+    bids = models.ManyToManyField(
+        'payment.Bid',
+        related_name='real_estate_bids',  # Altere para um nome único
+        verbose_name='Lances',
+        blank=True
+    )
     leilao = models.ForeignKey(
         'Auction',
         on_delete=models.CASCADE,
-        related_name='real_estates',  # Unique related name
+        related_name='real_estates',  # Ajustado para ser único
         verbose_name='Leilão',
         null=True,
         blank=True
     )
 
     class Meta:
-        pass
+        verbose_name = "Imóvel"
+        verbose_name_plural = "Imóveis"
+
 
 class Vehicle(BaseItem):
-    imagem = models.ImageField(upload_to='vehicles/', default='default/default_image.jpg')
-    imagens = models.ManyToManyField('ItemImage', related_name='vehicles', verbose_name="Imagens do Veículo")
+    thumbnail = models.ImageField(upload_to=generate_item_thumb_path, default='default/default_image.jpg')
+    imagens = models.ManyToManyField('ItemImage', related_name='vehicles_img', verbose_name="Imagens do Veículo")
     versao = models.CharField(max_length=100, verbose_name="Versão")
     fabricacao = models.IntegerField(verbose_name="Ano de Fabricação")
     marca = models.CharField(max_length=50, verbose_name="Marca")
@@ -283,26 +376,39 @@ class Vehicle(BaseItem):
     final_placa = models.CharField(max_length=1, verbose_name="Final da Placa")
     combustivel = models.CharField(max_length=50, verbose_name="Combustível")
     patio = models.CharField(max_length=100, verbose_name="Pátio")
-
+    bids = models.ManyToManyField(
+        'payment.Bid',
+        related_name='vehicle_bids',  # Altere para um nome único
+        verbose_name='Lances',
+        blank=True
+    )
     leilao = models.ForeignKey(
         'Auction',
         on_delete=models.CASCADE,
-        related_name='vehicles',  # Unique related name
+        related_name='vehicles',  # Ajustado para ser único
         verbose_name='Leilão',
         null=True,
         blank=True
     )
 
     class Meta:
-        pass
+        verbose_name = "Veículo"
+        verbose_name_plural = "Veículos"
+
 
 class OtherGoods(BaseItem):
-    imagem = models.ImageField(upload_to='outros_bens/', default='default/default_image.jpg')  
-    imagens = models.ManyToManyField('ItemImage', related_name='other_goods', verbose_name="Imagens do Item")
+    thumbnail = models.ImageField(upload_to=generate_item_thumb_path, default='default/default_image.jpg')  
+    imagens = models.ManyToManyField('ItemImage', related_name='other_goods_img', verbose_name="Imagens do Item")
+    bids = models.ManyToManyField(
+        'payment.Bid',
+        related_name='other_goods_bids',  # Altere para um nome único
+        verbose_name='Lances',
+        blank=True
+    )
     leilao = models.ForeignKey(
         'Auction',
         on_delete=models.CASCADE,
-        related_name='other_goods',  # Unique related name for Other Goods
+        related_name='other_goods',  # Ajustado para ser único
         verbose_name='Leilão',
         null=True,
         blank=True
@@ -314,5 +420,3 @@ class OtherGoods(BaseItem):
     class Meta:
         verbose_name = "Outro Bem"
         verbose_name_plural = "Outros Bens"
-
-

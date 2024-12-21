@@ -21,12 +21,10 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
+    path('', include('pages.urls')),  
     path('admin/', include('admin_custom.urls')),
-    path('', include('pages.urls')),  # URLs para o site do cliente
     path('categories/', include('categories.urls')),
-    #path('reviews/', include('reviews_ratings.urls')),
     path('accounts/', include('user_management.urls')),
-    path('accounts/', include('allauth.urls')),
 ]
 
 if settings.DEBUG:

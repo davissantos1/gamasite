@@ -7,60 +7,140 @@
 
     <!-- Seção de Detalhes do Leilão -->
     <div class="container mt-5">
-        <div class="text-center">
+        <div class="text-center mb-5">
             <h1 class="display-4">Detalhes do Leilão</h1>
-            <p class="lead">{{ leilao.nome }}</p>
+            <p class="lead">{{ leilao.descricao }}</p>
         </div>
 
         <div class="row mt-4">
             <div class="col-md-6">
                 <h3>Informações do Leilão</h3>
                 <ul class="list-unstyled">
-                    <li><strong>Data:</strong> {{ leilao.data|date:"d/m/Y" }}</li>
-                    <li><strong>Hora:</strong> {{ leilao.horario|time:"H:i" }}</li>
-                    <li><strong>Local:</strong> {{ leilao.local }}</li>
+                    <li><strong>Data:</strong> {{ leilao.date_time|date:"d/m/Y" }}</li>
+                    <li><strong>Hora:</strong> {{ leilao.date_time|time:"H:i" }}</li>
+                    <li><strong>Comitente:</strong> {{ leilao.comitente }}</li>
                     <li><strong>Descrição:</strong> {{ leilao.descricao }}</li>
+                    <li><strong>Quantidade de Lotes:</strong> {{ leilao.quantidade_lotes }}</li>
                 </ul>
             </div>
             <div class="col-md-6">
-                {% if leilao.imagem %}
-                    <img src="{{ leilao.imagem.url }}" alt="Imagem do Leilão" class="img-fluid rounded shadow">
+                {% if leilao.thumbnail %}
+                    <img src="{{ leilao.thumbnail.url }}" alt="thumbnail do Leilão" class="img-fluid rounded shadow-lg">
                 {% else %}
-                    <img src="{% static 'images/leilao_default.jpg' %}" alt="Imagem Padrão do Leilão" class="img-fluid rounded shadow">
+                    <img src="{% static 'images/leilao_default.jpg' %}" alt="thumbnail Padrão do Leilão" class="img-fluid rounded shadow-lg">
                 {% endif %}
             </div>
         </div>
 
         <!-- Seção de Itens do Leilão -->
         <div class="mt-5">
-            <h3 class="text-center">Itens do Leilão</h3>
-            <div class="table-responsive">
-                <table class="table table-bordered text-center">
-                    <thead class="thead-light">
-                        <tr>
-                            <th>#</th>
-                            <th>Nome do Item</th>
-                            <th>Descrição</th>
-                            <th>Valor Inicial</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% if leilao.itens.exists %}
-                            {% for item in leilao.itens.all %}
-                                <tr>
-                                    <td>{{ forloop.counter }}</td>
-                                    <td>{{ item.nome }}</td>
-                                    <td>{{ item.descricao }}</td>
-                                    <td>R$ {{ item.valor_inicial|floatformat:2 }}</td>
-                                </tr>
+            <h3 class="text-center mb-4">Itens do Leilão</h3>
+
+            <!-- Cards de Itens -->
+            <div class="row">
+                {% if leilao.vehicles.exists %}
+                    <div class="col-md-12">
+                        <h4 class="text-center mb-4">Veículos</h4>
+                        <div class="row">
+                            {% for item in leilao.vehicles.all %}
+                                <div class="col-md-3 mb-4">
+                                    <div class="card">
+                                        {% if item.thumbnail %}
+                                            <img src="{{ item.thumbnail.url }}" alt="{{ item.nome }}" class="card-img-top">
+                                        {% else %}
+                                            <img src="{% static 'images/default_item.jpg' %}" alt="thumbnail do Item" class="card-img-top">
+                                        {% endif %}
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ item.nome }}</h5>
+                                            <p class="card-text">{{ item.descricao }}</p>
+                                            <p class="card-text"><strong>Valor Inicial:</strong> R$ {{ item.valor_inicial|floatformat:2 }}</p>
+                                            <a href="#" class="btn btn-primary">Ver Detalhes</a>
+                                        </div>
+                                    </div>
+                                </div>
                             {% endfor %}
-                        {% else %}
-                            <tr>
-                                <td colspan="4">Nenhum item disponível neste leilão.</td>
-                            </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if leilao.real_estates.exists %}
+                    <div class="col-md-12">
+                        <h4 class="text-center mb-4">Imóveis</h4>
+                        <div class="row">
+                            {% for item in leilao.real_estates.all %}
+                                <div class="col-md-3 mb-4">
+                                    <div class="card">
+                                        {% if item.thumbnail %}
+                                            <img src="{{ item.thumbnail.url }}" alt="{{ item.nome }}" class="card-img-top">
+                                        {% else %}
+                                            <img src="{% static 'images/default_item.jpg' %}" alt="thumbnail do Item" class="card-img-top">
+                                        {% endif %}
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ item.nome }}</h5>
+                                            <p class="card-text">{{ item.descricao }}</p>
+                                            <p class="card-text"><strong>Valor Inicial:</strong> R$ {{ item.valor_inicial|floatformat:2 }}</p>
+                                            <a href="#" class="btn btn-primary">Ver Detalhes</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if leilao.rural_items.exists %}
+                    <div class="col-md-12">
+                        <h4 class="text-center mb-4">Bens Rurais</h4>
+                        <div class="row">
+                            {% for item in leilao.rural_items.all %}
+                                <div class="col-md-3 mb-4">
+                                    <div class="card">
+                                        {% if item.thumbnail %}
+                                            <img src="{{ item.thumbnail.url }}" alt="{{ item.nome }}" class="card-img-top">
+                                        {% else %}
+                                            <img src="{% static 'images/default_item.jpg' %}" alt="thumbnail do Item" class="card-img-top">
+                                        {% endif %}
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ item.nome }}</h5>
+                                            <p class="card-text">{{ item.descricao }}</p>
+                                            <p class="card-text"><strong>Valor Inicial:</strong> R$ {{ item.valor_inicial|floatformat:2 }}</p>
+                                            <a href="#" class="btn btn-primary">Ver Detalhes</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if leilao.other_goods.exists %}
+                    <div class="col-md-12">
+                        <h4 class="text-center mb-4">Outros Bens</h4>
+                        <div class="row">
+                            {% for item in leilao.other_goods.all %}
+                                <div class="col-md-3 mb-4">
+                                    <div class="card">
+                                        {% if item.thumbnail %}
+                                            <img src="{{ item.thumbnail.url }}" alt="{{ item.nome }}" class="card-img-top">
+                                        {% else %}
+                                            <img src="{% static 'images/default_item.jpg' %}" alt="thumbnail do Item" class="card-img-top">
+                                        {% endif %}
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ item.nome }}</h5>
+                                            <p class="card-text">{{ item.descricao }}</p>
+                                            <p class="card-text"><strong>Valor Inicial:</strong> R$ {{ item.valor_inicial|floatformat:2 }}</p>
+                                            <a href="#" class="btn btn-primary">Ver Detalhes</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if not leilao.vehicles.exists and not leilao.real_estates.exists and not leilao.rural_items.exists and not leilao.other_goods.exists %}
+                    <p class="text-center w-100">Nenhum item disponível neste leilão.</p>
+                {% endif %}
             </div>
         </div>
     </div>

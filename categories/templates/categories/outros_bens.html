@@ -28,12 +28,12 @@
             {% for bem in outros_bens %}
             <div class="col-md-4">
                 <div class="card mb-4">
-                    <img src="{{ bem.imagem.url }}" alt="{{ bem.nome }}" class="card-img-top">
+                    <img src="{{ bem.thumbnail.url }}" alt="{{ bem.nome }}" class="card-img-top">
                     <div class="card-body">
                         <h5 class="card-title">{{ bem.nome }}</h5>
-                        <p class="card-text">Categoria: {{ bem.categoria }}</p>
-                        <p class="card-text">Preço estimado: R$ {{ bem.preco_estima|floatformat:2 }}</p>
-                        <a href="{% url 'category_outros_bens_detail' bem.id %}" class="btn btn-secondary btn-block">Ver Detalhes</a>
+                        <p class="card-text">Descrição: {{ bem.descricao }}</p>
+                        <p class="card-text">Preço estimado: R$ {{ bem.valor_avaliado|floatformat:2 }}</p>
+                        <a href="" class="btn btn-secondary btn-block">Ver Detalhes</a>
                     </div>
                 </div>
             </div>

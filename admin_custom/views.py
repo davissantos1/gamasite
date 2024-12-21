@@ -3,26 +3,8 @@ from django.contrib.auth.models import User
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum, Count
-from auction_management.models import RuralItem, RealEstate, Vehicle, OtherGoods, Auction, Bid, BaseItem
-
-@login_required
-def list_clients(request):
-    clients = User.objects.all().order_by('date_joined')
-    return render(request, 'admin/client_list.html', {'clients': clients})
-
-
-@login_required
-def list_auctions(request):
-    # Ordenando pelos campos corretos, neste caso 'codigo_leilao'
-    auctions = Auction.objects.all().order_by('codigo_leilao')
-    return render(request, 'admin/auction_list.html', {'auctions': auctions})
-
-
-@login_required
-def list_items(request):
-    items = BaseItem.objects.all().order_by('codigo_item')
-    return render(request, 'admin/item_list.html', {'items': items})
-
+from auction_management.models import RuralItem, RealEstate, Vehicle, OtherGoods, Auction, BaseItem
+from payment.models import Bid, Payment
 
 
 @staff_member_required  # Garante que apenas usuários staff podem acessar

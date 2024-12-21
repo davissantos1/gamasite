@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+{% load static %}
+{% include '_head.html' %}
+<body>
+    {% include '_header.html' %}
+
+    <!-- Seção de Detalhes do Item -->
+    <div class="container mt-5">
+        <div class="text-center">
+            <h1 class="display-4">Detalhes do Item</h1>
+            <p class="lead">{{ item.nome }}</p>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-6">
+                {% if item.thumbnail %}
+                    <img src="{{ item.thumbnail.url }}" alt="Imagem do Item" class="img-fluid rounded shadow">
+                {% else %}
+                    <img src="{% static 'images/default_item.jpg' %}" alt="Imagem Padrão do Item" class="img-fluid rounded shadow">
+                {% endif %}
+            </div>
+            <div class="col-md-6">
+                <h3>Informações do Item</h3>
+                <ul class="list-unstyled">
+                    <li><strong>Descrição:</strong> {{ item.descricao }}</li>
+                    <li><strong>Valor Avaliado:</strong> R$ {{ item.valor_avaliado|floatformat:2 }}</li>
+                    <li><strong>Status do Lote:</strong> {{ item.status_lote }}</li>
+                    <li><strong>Status de Pagamento:</strong> {{ item.status_pagamento }}</li>
+                </ul>
+                {% if item.bids.exists %}
+                    <h4>Lances</h4>
+                    <ul>
+                        {% for bid in item.bids.all %}
+                            <li>{{ bid.usuario }} - R$ {{ bid.valor|floatformat:2 }} - {{ bid.data_lance|date:"d/m/Y H:i" }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if item_type == 'Vehicle' %}
+            <div class="mt-5">
+                <h4>Detalhes do Veículo</h4>
+                <ul class="list-unstyled">
+                    <li><strong>Marca:</strong> {{ item.marca }}</li>
+                    <li><strong>Modelo:</strong> {{ item.modelo }}</li>
+                    <li><strong>Ano de Fabricação:</strong> {{ item.fabricacao }}</li>
+                    <li><strong>Categoria:</strong> {{ item.categoria_veiculo }}</li>
+                    <li><strong>FIPE:</strong> R$ {{ item.fipe|floatformat:2 }}</li>
+                </ul>
+            </div>
+        {% elif item_type == 'RealEstate' %}
+            <div class="mt-5">
+                <h4>Detalhes do Imóvel</h4>
+                <ul class="list-unstyled">
+                    <li><strong>Localização:</strong> {{ item.localizacao }}</li>
+                    <li><strong>Estado do Imóvel:</strong> {{ item.estado_imovel }}</li>
+                    <li><strong>Quartos:</strong> {{ item.quartos }}</li>
+                    <li><strong>Metragem:</strong> {{ item.metragem }} m²</li>
+                </ul>
+            </div>
+        {% elif item_type == 'RuralItem' %}
+            <div class="mt-5">
+                <h4>Detalhes do Item Rural</h4>
+                <ul class="list-unstyled">
+                    <li><strong>Origem:</strong> {{ item.origem }}</li>
+                </ul>
+            </div>
+        {% elif item_type == 'OtherGoods' %}
+            <div class="mt-5">
+                <h4>Detalhes do Item</h4>
+                <p>{{ item.descricao }}</p>
+            </div>
+        {% endif %}
+    </div>
+
+    {% include '_footer.html' %}
+</body>
+</html>

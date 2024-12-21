@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 
 urlpatterns = [
@@ -9,4 +9,7 @@ urlpatterns = [
     path('profile/lances/', views.lances_view, name='account_lance'),  # Página de Lances
     path('profile/financeiro/', views.financeiro_view, name='account_financeiro'),  # Página Financeiro
     path('profile/documentos/', views.documentos_view, name='account_documentos'),  # Página Documentos
+    path('documentos/<int:documento_id>/', views.serve_documento, name='serve_documento'),
+    path('', include('allauth.urls')),
 ]
+

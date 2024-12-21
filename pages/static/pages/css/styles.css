@@ -48,13 +48,13 @@ body.signup-page {
 
 .carousel {
     position: relative;
-    max-height: 400px;
+    max-height: 600px;
     overflow: hidden;
 }
 
 .carousel img {
     object-fit: cover;
-    height: 400px;
+    height: 350px;
 }
 
 .custom-arrow {

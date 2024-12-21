@@ -5,6 +5,9 @@ from allauth.account.forms import LoginForm
 from django.contrib.auth.decorators import login_required
 from .models import Arrematante, Documento
 from .forms import DocumentoForm
+from django.conf import settings
+from django.http import HttpResponse, Http404
+import os
 
 def custom_login_view(request):
     form = LoginForm(request.POST or None)
@@ -129,6 +132,28 @@ def lances_view(request):
         'lances': lances,
     })
 
+
+@login_required
+def serve_documento(request, documento_id):
+    try:
+        documento = Documento.objects.get(id=documento_id)
+    except Documento.DoesNotExist:
+        raise Http404("Documento não encontrado.")
+    
+    # Verifique se o usuário autenticado é o usuário associado ao arrematante do documento
+    if documento.arrematante.user != request.user:
+        raise Http404("Você não tem permissão para acessar este documento.")
+    
+    # Caminho para o arquivo
+    file_path = os.path.join(settings.PROTECTED_DOCUMENTS_DIR, documento.documento.name)
+    
+    # Verifique se o arquivo realmente existe
+    if not os.path.exists(file_path):
+        raise Http404("Arquivo não encontrado.")
+    
+    # Servir o arquivo
+    with open(file_path, 'rb') as f:
+        return HttpResponse(f.read(), content_type="application/pdf")
 
 
 @login_required

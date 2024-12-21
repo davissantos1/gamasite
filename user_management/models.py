@@ -1,8 +1,22 @@
+from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.exceptions import ValidationError
+from django.core.files.storage import FileSystemStorage
+
+# Adicione constantes para tipos de usuário
+USER_TYPE_CHOICES = [
+    ('arrematante', 'Arrematante'),
+    ('admin', 'Admin'),
+    ('default', 'Default'),
+]
+
+# Adicione o campo ao modelo User
+User.add_to_class('user_type', models.CharField(
+    max_length=15, choices=USER_TYPE_CHOICES, default='default'
+))
 
 class Documento(models.Model):
     TIPO_DOCUMENTO_CHOICES = [
@@ -11,7 +25,7 @@ class Documento(models.Model):
         ('PASSAPORTE', 'Passaporte'),
         ('COMPROVANTE_RESIDENCIA', 'Comprovante de Residência'),
         ('CONTRATO_SOCIAL', 'Contrato Social'),
-        ('SELFIE', 'Selfie'),  # Adicionando a opção "Selfie"
+        ('SELFIE', 'Selfie'),  
     ]
 
     STATUS_CHOICES = [
@@ -24,7 +38,7 @@ class Documento(models.Model):
         'Arrematante', related_name='documentos', on_delete=models.CASCADE, null=True, blank=True
     )
     tipo_documento = models.CharField(max_length=50, choices=TIPO_DOCUMENTO_CHOICES)
-    documento = models.FileField(upload_to='documentos/', blank=False, null=False)
+    documento = models.FileField(upload_to='documentos/', storage=FileSystemStorage(location=settings.PROTECTED_DOCUMENTS_DIR), blank=False, null=False)
     data_upload = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=1, choices=STATUS_CHOICES, default='P')  # Campo de status
 
@@ -43,13 +57,11 @@ class Documento(models.Model):
         # Validar qual tipo de usuário está enviando o documento e garantir que os documentos sejam válidos
         if self.arrematante:
             if self.arrematante.tipo_cadastro == 'PF':
-                # Para Pessoa Física (PF), exige RG, CNH, Passaporte, Comprovante de Residência ou Selfie
                 if self.tipo_documento == 'COMPROVANTE_RESIDENCIA':
                     return  # Comprovante de Residência é permitido para PF
                 elif self.tipo_documento not in ['RG', 'CNH', 'PASSAPORTE', 'SELFIE']:
                     raise ValidationError('Para Pessoa Física (PF), é necessário enviar RG, CNH, Passaporte, Comprovante de Residência ou Selfie.')
             elif self.arrematante.tipo_cadastro == 'PJ':
-                # Para Pessoa Jurídica (PJ), exige Contrato Social, Comprovante de Residência ou Selfie
                 if self.tipo_documento in ['COMPROVANTE_RESIDENCIA', 'CONTRATO_SOCIAL', 'SELFIE']:
                     return  # Comprovante de Residência, Contrato Social e Selfie são permitidos para PJ
                 raise ValidationError('Para Pessoa Jurídica (PJ), é necessário enviar Contrato Social, Comprovante de Residência ou Selfie.')
@@ -111,15 +123,16 @@ class Admin(models.Model):
         verbose_name_plural = "Admins"
 
 
-# Sinais para criar perfis automaticamente após a criação de um usuário
+
+# Sinal para criar perfis automaticamente após a criação de um usuário
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
-        # Criar perfil de Arrematante
-        if hasattr(instance, "arrematante") and not instance.arrematante:
-            arrematante = Arrematante.objects.create(
+        # Criar perfil de Arrematante como padrão
+        if not hasattr(instance, "arrematante"):
+            Arrematante.objects.create(
                 user=instance,
-                cpf_cnpj='',  # Campos vazios ou com valores padrão podem ser definidos
+                cpf_cnpj='',
                 cep='',
                 logradouro='',
                 numero='',
@@ -130,23 +143,24 @@ def create_user_profile(sender, instance, created, **kwargs):
                 pais='',
                 telefone_comercial='',
                 telefone_celular='',
-                tipo_cadastro='',  # Define um tipo padrão (pode ser PF ou PJ)
+                tipo_cadastro='PF',  # Tipo padrão Pessoa Física
             )
-            arrematante.save()
 
-        # Criar perfil de Admin
-        elif hasattr(instance, "admin") and not instance.admin:
-            admin = Admin.objects.create(
+        # Caso específico: criar perfil de Admin (se necessário, baseado em lógica adicional)
+        if not hasattr(instance, "admin"):
+            Admin.objects.create(
                 user=instance,
-                setor='',  # Pode preencher com dados padrão
-                telefone='',  # Pode preencher com dados padrão
+                setor='',  # Dados padrão
+                telefone='',  # Dados padrão
             )
-            admin.save()
 
-
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
+    # Atualiza o campo user_type, garantindo que o sinal não cause um loop
+    user_type = 'default'  # Valor padrão
     if hasattr(instance, "arrematante"):
-        instance.arrematante.save()
+        user_type = 'arrematante'
     elif hasattr(instance, "admin"):
-        instance.admin.save()
+        user_type = 'admin'
+
+    if instance.user_type != user_type:  # Apenas salva se houver mudança
+        instance.user_type = user_type
+        instance.save(update_fields=["user_type"])

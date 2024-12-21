@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+{% include '_head.html' %}
+<body>
+    {% include '_header.html' %}
+    <div class="container mt-5 mb-5 p-4">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1>Oops! Item Não Encontrado</h1>
+                <p>Desculpe, o item que você está procurando não foi encontrado.</p>
+                <p>Por favor, verifique o código do item ou retorne à página inicial.</p>
+                <a href="{% url 'pages:home' %}" class="btn btn-primario">Voltar para a Página Inicial</a>
+            </div>
+        </div>
+    </div>
+    {% include '_footer.html' %}
+</body>
+</html>

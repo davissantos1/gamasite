@@ -25,16 +25,16 @@
     <div class="container mt-5">
         <h2 class="h3">Bens Rurais em Leilão</h2>
         <div class="row">
-            {% for bem_rural in bens_rurais %}
+            {% for bem_rural in rural %} <!-- Alteração aqui: de bens_rurais para rural -->
             <div class="col-md-4">
                 <div class="card mb-4">
-                    <img src="{{ bem_rural.imagem.url }}" alt="{{ bem_rural.titulo }}" class="card-img-top">
+                    <img src="{{ bem_rural.thumbnail.url }}" alt="{{ bem_rural.nome }}" class="card-img-top">
                     <div class="card-body">
-                        <h5 class="card-title">{{ bem_rural.titulo }}</h5>
-                        <p class="card-text">Área: {{ bem_rural.area }} ha</p>
-                        <p class="card-text">Localização: {{ bem_rural.localizacao }}</p>
-                        <p class="card-text">Preço estimado: R$ {{ bem_rural.preco_estima|floatformat:2 }}</p>
-                        <a href="{% url 'category_rural_detail' bem_rural.id %}" class="btn btn-secondary btn-block">Ver Detalhes</a>
+                        <h5 class="card-title">{{ bem_rural.nome }}</h5>
+                        <p class="card-text">Tipo de item: {{ bem_rural.tipo_item }} </p>
+                        <p class="card-text">Descrição: {{ bem_rural.descricao }}</p>
+                        <p class="card-text">Preço estimado: R$ {{ bem_rural.valor_avaliado|floatformat:2 }}</p>
+                        <a href="#" class="btn btn-secondary btn-block">Ver Detalhes</a>
                     </div>
                 </div>
             </div>

@@ -71,6 +71,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    #'user_management.middleware.UserTypeAccessControlMiddleware',
     # Middleware do AllAuth 
     'allauth.account.middleware.AccountMiddleware',
 ]
@@ -149,7 +150,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 
-
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Este é o diretório onde os arquivos estáticos serão coletados
 
@@ -157,6 +157,12 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),  # Este é o diretório onde os arquivos estáticos do projeto são armazenados
 ]
 
+# Defina o caminho para a pasta protegida fora da pasta `media/`
+PROTECTED_DOCUMENTS_DIR = os.path.join(BASE_DIR, 'protected_documents')
+
+# Media settings
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -183,6 +189,3 @@ AUTHENTICATION_BACKENDS = (
 # Email settings
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# Media settings
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
