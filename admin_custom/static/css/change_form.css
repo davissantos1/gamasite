@@ -1,0 +1,13 @@
+.fieldset-heading{
+    display: none;
+}
+
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.form-group {
+    flex: 1 1 50%;
+    padding: 10px;
+}

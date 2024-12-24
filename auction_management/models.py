@@ -4,6 +4,8 @@ from django.conf import settings
 from datetime import timedelta
 import uuid
 from categories.models import AuctionCategory
+from decimal import Decimal
+
 
 def default_auction_time():
     """Retorna a data e hora atual."""
@@ -163,6 +165,13 @@ class BaseItem(models.Model):
         verbose_name="Valor Avaliado",
         default=0.00
     )
+    valor_inicial = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name="Valor Inicial",
+        null=True,
+        blank=True
+    )
     codigo_item = models.CharField(
         max_length=50,
         primary_key=True,
@@ -183,7 +192,6 @@ class BaseItem(models.Model):
         null=True,
         blank=True
     )
-    imagens = models.ManyToManyField('ItemImage', related_name='itens', verbose_name="Imagens do Item")
     valor_arrematado = models.DecimalField(
         max_digits=10,
         decimal_places=2,
@@ -209,7 +217,7 @@ class BaseItem(models.Model):
     )
     bids = models.ManyToManyField(
         'payment.Bid',
-        related_name='base_items',  # Ajustar o related_name para ser único
+        related_name='item_lance',  # Ajustar o related_name para ser único
         verbose_name='Lances',
         blank=True
     )
@@ -217,6 +225,13 @@ class BaseItem(models.Model):
     def save(self, *args, **kwargs):
         if not self.codigo_item:
             self.codigo_item = generate_item_code(self)
+
+        # Verifica e define o valor inicial como 50% do valor avaliado
+        if self.valor_avaliado and self.valor_inicial is None:
+            self.valor_inicial = self.valor_avaliado * Decimal('0.5')
+
+        # Inicializa a variável total_items
+        total_items = 0
 
         if self.leilao:
             total_items = (
@@ -226,6 +241,7 @@ class BaseItem(models.Model):
                 self.leilao.rural_items.count()
             )
 
+        # Verifica se o número de itens excede a quantidade de lotes permitidos
         if total_items >= self.leilao.quantidade_lotes:
             raise ValueError("Este leilão já atingiu o número máximo de itens permitido.")
 
@@ -255,19 +271,17 @@ class ItemImage(models.Model):
     imagem = models.ImageField(upload_to=generate_item_image_path, verbose_name="Imagem do Item")
     descricao = models.CharField(max_length=255, blank=True, null=True, verbose_name="Descrição da Imagem")
 
-    # Relacionamento com diferentes modelos
-    vehicle = models.ForeignKey(
-        'Vehicle', on_delete=models.CASCADE, related_name='vehicle_images', null=True, blank=True, verbose_name="Veículo"
-    )
-    real_estate = models.ForeignKey(
-        'RealEstate', on_delete=models.CASCADE, related_name='real_estate_images', null=True, blank=True, verbose_name="Imóvel"
-    )
-    rural_item = models.ForeignKey(
-        'RuralItem', on_delete=models.CASCADE, related_name='rural_item_images', null=True, blank=True, verbose_name="Item Rural"
-    )
-    other_goods = models.ForeignKey(
-        'OtherGoods', on_delete=models.CASCADE, related_name='other_goods_images', null=True, blank=True, verbose_name="Outros Bens"
-    )
+    # Relacionamento com RealEstate, com 'related_name' único
+    real_estate = models.ForeignKey('RealEstate', related_name='imagens_realestate', on_delete=models.CASCADE, blank=True, null=True)
+    
+    # Relacionamento com Vehicle
+    vehicle = models.ForeignKey('Vehicle', related_name='imagens_vehicle', on_delete=models.CASCADE, blank=True, null=True)
+    
+    # Relacionamento com RuralItem
+    rural_item = models.ForeignKey('RuralItem', related_name='imagens_ruralitem', on_delete=models.CASCADE, blank=True, null=True)
+    
+    # Relacionamento com OtherGoods
+    other_goods = models.ForeignKey('OtherGoods', related_name='imagens_othergoods', on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
         return self.descricao if self.descricao else f"Imagem {self.id}"
@@ -275,7 +289,6 @@ class ItemImage(models.Model):
     class Meta:
         verbose_name = "Imagem do Item"
         verbose_name_plural = "Imagens dos Itens"
-
 
 class ItemType(models.Model):
     VEICULO = 'Veículo'
@@ -304,8 +317,8 @@ class ItemType(models.Model):
 
 class RuralItem(BaseItem):
     thumbnail = models.ImageField(upload_to=generate_item_thumb_path, default='default/default_image.jpg')  
+    imagens = models.ManyToManyField(ItemImage, related_name='rural_item_imagens')
     origem = models.CharField(max_length=50, default="Rural", verbose_name="Origem")
-    imagens = models.ManyToManyField('ItemImage', related_name='rural_item_img', verbose_name="Imagens do Item Rural")
     bids = models.ManyToManyField(
         'payment.Bid',
         related_name='rural_item_bids',  # Altere para um nome único
@@ -330,8 +343,8 @@ class RuralItem(BaseItem):
 
 
 class RealEstate(BaseItem):
-    thumbnail = models.ImageField(upload_to=generate_item_thumb_path, default='default/default_image.jpg')  
-    imagens = models.ManyToManyField('ItemImage', related_name='real_estate_img', verbose_name="Imagens do Imóvel")
+    thumbnail = models.ImageField(upload_to=generate_item_thumb_path, default='default/default_image.jpg') 
+    imagens = models.ManyToManyField(ItemImage, related_name='real_estate_imagens')
     quartos = models.IntegerField(verbose_name="Quartos")
     metragem = models.FloatField(verbose_name="Metragem")
     localizacao = models.CharField(max_length=255, verbose_name="Localização")
@@ -358,7 +371,7 @@ class RealEstate(BaseItem):
 
 class Vehicle(BaseItem):
     thumbnail = models.ImageField(upload_to=generate_item_thumb_path, default='default/default_image.jpg')
-    imagens = models.ManyToManyField('ItemImage', related_name='vehicles_img', verbose_name="Imagens do Veículo")
+    imagens = models.ManyToManyField(ItemImage, related_name='vehicle_imagens')
     versao = models.CharField(max_length=100, verbose_name="Versão")
     fabricacao = models.IntegerField(verbose_name="Ano de Fabricação")
     marca = models.CharField(max_length=50, verbose_name="Marca")
@@ -397,8 +410,8 @@ class Vehicle(BaseItem):
 
 
 class OtherGoods(BaseItem):
-    thumbnail = models.ImageField(upload_to=generate_item_thumb_path, default='default/default_image.jpg')  
-    imagens = models.ManyToManyField('ItemImage', related_name='other_goods_img', verbose_name="Imagens do Item")
+    thumbnail = models.ImageField(upload_to=generate_item_thumb_path, default='default/default_image.jpg')
+    imagens = models.ManyToManyField(ItemImage, related_name='other_goods_imagens')  
     bids = models.ManyToManyField(
         'payment.Bid',
         related_name='other_goods_bids',  # Altere para um nome único

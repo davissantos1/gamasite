@@ -9,8 +9,8 @@ class BidAdmin(admin.ModelAdmin):
     list_display = (
         'id', 'user', 'item_display', 'amount', 'timestamp', 'is_valid'
     )
-    list_filter = ('is_valid', 'timestamp', 'content_type')
-    search_fields = ('user__username', 'user__email', 'content_type__model', 'object_id')
+    list_filter = ('is_valid', 'timestamp', )
+    search_fields = ('user__username', 'user__email',)
     ordering = ('-timestamp',)
     date_hierarchy = 'timestamp'
     readonly_fields = ('timestamp',)
@@ -26,7 +26,7 @@ class BidAdmin(admin.ModelAdmin):
     fieldsets = (
         ("Informações do Lance", {
             "fields": (
-                'user', 'content_type', 'object_id', 'amount', 'is_valid', 'timestamp'
+                'user', 'amount', 'is_valid', 'timestamp'
             )
         }),
     )

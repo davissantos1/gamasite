@@ -7,16 +7,6 @@ class Bid(models.Model):
     """
     Modelo representando os lances feitos no sistema de leilão.
     """
-    # Campo para relacionar com qualquer modelo concreto
-    content_type = models.ForeignKey(
-        ContentType,
-        on_delete=models.CASCADE,
-        related_name='bids',
-        verbose_name='Tipo de Item'
-    )
-    object_id = models.PositiveIntegerField(verbose_name='ID do Item')
-    item = GenericForeignKey('content_type', 'object_id')
-
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,

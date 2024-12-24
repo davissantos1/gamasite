@@ -1,0 +1,116 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'css/index.css' %}">
+{% endblock %}
+
+{% block coltype %}
+  col-md-8 offset-md-2
+{% endblock %}
+
+{% block bodyclass %}
+  {{ block.super }} dashboard
+{% endblock %}
+
+{% block nav-breadcrumbs %}
+  <!-- Breadcrumbs can be added here if necessary -->
+{% endblock %}
+
+{% block nav-sidebar %}
+  <!-- Custom sidebar, if needed -->
+{% endblock %}
+
+{% block content %}
+  <div id="content-main">
+    <h1 class="text-center text-primary">{% translate 'Welcome to the Admin Dashboard' %}</h1>
+
+    <!-- App List Section -->
+    <div class="app-list-container">
+      <h2>{% translate 'Applications' %}</h2>
+      <div class="app-list">
+        {% for app in app_list %}
+          <div class="model-item d-flex justify-content-between align-items-center">
+            <span>{{ app.name }}</span>
+            <div class="d-flex">
+              <a href="{{ app.app_url }}" class="btn btn-primary btn-sm me-2">{% translate 'View' %}</a>
+              <a href="{{ app.add_url }}" class="btn btn-success btn-sm">{% translate 'Add New' %}</a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Recent Actions Section -->
+    <div id="content-related">
+      <div class="module recent-actions-box">
+        <h2>{% translate 'Recent Actions' %}</h2>
+        <h3>{% translate 'My Actions' %}</h3>
+        {% load log %}
+        {% get_admin_log 10 as admin_log for_user user %}
+        {% if not admin_log %}
+          <p>{% translate 'No recent actions found.' %}</p>
+        {% else %}
+          <ul class="actionlist">
+            {% for entry in admin_log %}
+              <li class="{% if entry.is_addition %}addlink{% elif entry.is_change %}changelink{% elif entry.is_deletion %}deletelink{% endif %}">
+                <div>
+                  {% if entry.is_deletion or not entry.get_admin_url %}
+                    {{ entry.object_repr }}
+                  {% else %}
+                    <a href="{{ entry.get_admin_url }}">{{ entry.object_repr }}</a>
+                  {% endif %}
+                </div>
+                <div class="mini quiet">
+                  {% if entry.content_type %}
+                    {% filter capfirst %}{{ entry.content_type.name }}{% endfilter %}
+                  {% else %}
+                    {% translate 'Unknown content' %}
+                  {% endif %}
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block sidebar %}
+  <div id="content-related">
+    <div class="module recent-actions-box">
+      <h2>{% translate 'Recent Actions' %}</h2>
+      <div>
+        <h3>{% translate 'My Actions' %}</h3>
+        {% load log %}
+        {% get_admin_log 10 as admin_log for_user user %}
+        {% if not admin_log %}
+          <p>{% translate 'No recent actions found.' %}</p>
+        {% else %}
+          <ul class="actionlist">
+            {% for entry in admin_log %}
+              <li class="{% if entry.is_addition %}addlink{% elif entry.is_change %}changelink{% elif entry.is_deletion %}deletelink{% endif %}">
+                <div>
+                  {% if entry.is_deletion or not entry.get_admin_url %}
+                    {{ entry.object_repr }}
+                  {% else %}
+                    <a href="{{ entry.get_admin_url }}">{{ entry.object_repr }}</a>
+                  {% endif %}
+                </div>
+                <div class="mini quiet">
+                  {% if entry.content_type %}
+                    {% filter capfirst %}{{ entry.content_type.name }}{% endfilter %}
+                  {% else %}
+                    {% translate 'Unknown content' %}
+                  {% endif %}
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock %}

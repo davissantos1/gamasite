@@ -95,11 +95,15 @@ def item_details(request, codigo_leilao, codigo_item):
         # Caso o item não seja encontrado
         return render(request, 'pages/item_not_found.html', {'codigo_item': codigo_item})
 
-    # Passando o item encontrado para o template
+    # Certifique-se de que o item tem imagens associadas
+    images = item.imagens.all() if item.imagens.exists() else []  # Obtenção das imagens associadas ao item
+
+    # Passando o item encontrado para o template, incluindo as imagens
     return render(request, 'pages/item_details.html', {
         'leilao': leilao,
         'item': item,
-        'item_type': item_type
+        'item_type': item_type,
+        'images': images,  # Passando as imagens associadas ao item
     })
 
 
