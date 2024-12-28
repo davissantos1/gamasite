@@ -8,106 +8,42 @@ import locale
 # Definir a localidade para o Brasil
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 
-class ItemImageAdmin(admin.ModelAdmin):
-    # Campos que serão exibidos na lista de itens do admin
-    list_display = ('id', 'descricao', 'imagem', 'get_image_preview')
-    
-    # Campos que serão usados para pesquisa
-    search_fields = ('descricao',)
-    
-    # Filtros para facilitar a busca
-    list_filter = ('descricao',)
-    
-    # Campos de visualização de imagem na administração
-    def get_image_preview(self, obj):
-        return f'<img src="{obj.imagem.url}" width="100" />'
-    
-    get_image_preview.allow_tags = True
-    get_image_preview.short_description = 'Pré-visualização da Imagem'
+from django.contrib import admin
 
-    # Configurações de campo para o formulário de edição de itens
-    fields = ('imagem', 'descricao')
-    # Definir a ordem dos campos no formulário de edição
-    ordering = ('descricao',)
+class ItemImageInline(admin.TabularInline):
+    model = ItemImage
+    extra = 0  # Garante que sempre haja uma linha em branco para criar novas instâncias
+    fields = ('imagem',)  # Inclui o campo de descrição
+    readonly_fields = ()  # Define campos somente leitura se necessário
 
-# Registrar o modelo e o admin personalizado
-admin.site.register(ItemImage, ItemImageAdmin)
+    def save_new_instance(self, obj, parent_instance):
+        """Associa a nova imagem ao modelo pai correto."""
+        if isinstance(parent_instance, Vehicle):
+            obj.vehicle = parent_instance
+        elif isinstance(parent_instance, RealEstate):
+            obj.real_estate = parent_instance
+        elif isinstance(parent_instance, RuralItem):
+            obj.rural_item = parent_instance
+        elif isinstance(parent_instance, OtherGoods):
+            obj.other_goods = parent_instance
+        obj.save()
 
-# Definir o Inline para Imagens
-class VehicleItemImageInline(admin.TabularInline):
-    model = Vehicle.imagens.through
-    extra = 1
-    fields = ['imagem_display', 'itemimage']  # Exibir imagem e link para o campo de imagem
-    readonly_fields = ['imagem_display']  # Tornar a exibição da imagem somente leitura
-    can_delete = True
-    show_change_link = True
-    verbose_name = 'Imagem do Item'
-    verbose_name_plural = 'Imagens dos Itens'
+    def save_formset(self, request, form, formset, change):
+        """Sobrescreve a lógica de salvar para associar corretamente a imagem."""
+        instances = formset.save(commit=False)
+        for instance in instances:
+            if not instance.pk:  # Verifica se é uma nova instância
+                self.save_new_instance(instance, form.instance)
+        formset.save_m2m()  # Salva as relações ManyToMany
 
-    # Método para exibir a imagem no admin
-    def imagem_display(self, obj):
-        if obj.itemimage.imagem:
-            return format_html('<img src="{}" width="100" />', obj.itemimage.imagem.url)
-        return "Sem Imagem"
-    imagem_display.short_description = 'Visualização da Imagem'
+    def get_formset(self, request, obj=None, **kwargs):
+        """Permite configurar o parent_model_instance e garantir que o formset sempre crie novas instâncias."""
+        self.parent_model_instance = obj
 
+        # Não faz alterações no queryset, o que garantirá que o formset não carregue instâncias existentes.
+        return super().get_formset(request, obj, **kwargs)
 
-
-# Definir o Inline para Imagens
-class RealEstateItemImageInline(admin.TabularInline):
-    model = RealEstate.imagens.through
-    extra = 0
-    fields = ['imagem_display', 'itemimage']  # Exibir imagem e link para o campo de imagem
-    readonly_fields = ['imagem_display']  # Tornar a exibição da imagem somente leitura
-    can_delete = True
-    show_change_link = True
-    verbose_name = 'Imagem do Item'
-    verbose_name_plural = 'Imagens dos Itens'
-
-    # Método para exibir a imagem no admin
-    def imagem_display(self, obj):
-        if obj.itemimage:
-            return format_html('<img src="{}" width="100" />', obj.itemimage.url)
-        return "Sem Imagem"
-    imagem_display.short_description = 'Visualização da Imagem'
-
-# Definir o Inline para Imagens
-class OtherGoodsItemImageInline(admin.TabularInline):
-    model = OtherGoods.imagens.through
-    extra = 0
-    fields = ['imagem_display', 'itemimage']  # Exibir imagem e link para o campo de imagem
-    readonly_fields = ['imagem_display']  # Tornar a exibição da imagem somente leitura
-    can_delete = True
-    show_change_link = True
-    verbose_name = 'Imagem do Item'
-    verbose_name_plural = 'Imagens dos Itens'
-
-    # Método para exibir a imagem no admin
-    def imagem_display(self, obj):
-        if obj.itemimage:
-            return format_html('<img src="{}" width="100" />', obj.itemimage.url)
-        return "Sem Imagem"
-    imagem_display.short_description = 'Visualização da Imagem'
-
-# Definir o Inline para Imagens
-class RuralItemItemImageInline(admin.TabularInline):
-    model = RuralItem.imagens.through
-    extra = 0
-    fields = ['imagem_display', 'itemimage']  # Exibir imagem e link para o campo de imagem
-    readonly_fields = ['imagem_display']  # Tornar a exibição da imagem somente leitura
-    can_delete = True
-    show_change_link = True
-    verbose_name = 'Imagem do Item'
-    verbose_name_plural = 'Imagens dos Itens'
-
-    # Método para exibir a imagem no admin
-    def imagem_display(self, obj):
-        if obj.itemimage:
-            return format_html('<img src="{}" width="100" />', obj.itemimage.url)
-        return "Sem Imagem"
-    imagem_display.short_description = 'Visualização da Imagem'
-
-# Definir a classe do formulário para adicionar o calendário aos campos de data
+# Classe do formulário de leilão com calendário
 class AuctionAdminForm(forms.ModelForm):
     class Meta:
         model = Auction
@@ -116,14 +52,17 @@ class AuctionAdminForm(forms.ModelForm):
 
 class AuctionAdmin(admin.ModelAdmin):
     form = AuctionAdminForm
-    list_display = ['codigo_leilao', 'descricao', 'comitente', 'date_time', 'quantidade_lotes', 'active']
+    list_display = ['codigo_leilao', 'descricao', 'comitente', 'date_time', 'quantidade_lotes', 'status', 'imagem_thumbnail']
     search_fields = ['codigo_leilao', 'descricao', 'comitente']
-    list_filter = ['active']
+    list_filter = ['status']
     readonly_fields = ['codigo_leilao']
 
     fieldsets = (
+        ('Status atual do leilão', {
+            'fields': ('codigo_leilao', 'status')
+        }),
         ('Detalhes do Leilão', {
-            'fields': ('codigo_leilao', 'descricao', 'categoria', 'comitente', 'complemento', 'active')
+            'fields': ('descricao', 'categoria', 'comitente', 'complemento')
         }),
         ('Data e Duração', {
             'fields': ('date_time', 'duration_hours', 'quantidade_lotes'),
@@ -132,17 +71,23 @@ class AuctionAdmin(admin.ModelAdmin):
             'fields': ('thumbnail', 'documento_editais'),
         }),
     )
-    
+
     def get_readonly_fields(self, request, obj=None):
         if obj:
             return self.readonly_fields + ['codigo_leilao']
         return self.readonly_fields
+    
+    def imagem_thumbnail(self, obj):
+        if obj.thumbnail:
+            return format_html('<img src="{}" width="50" height="50" />', obj.thumbnail.url)
+        return "Sem Imagem"
 
+# Base admin para os itens, como veículos, imóveis, etc.
 class BaseItemAdmin(admin.ModelAdmin):
-    readonly_fields = ['codigo_item', 'valor_arrematado', 'status_pagamento', 'status_lote', 'valor_inicial']  
+    readonly_fields = ['codigo_item', 'valor_arrematado', 'status_pagamento', 'status_lote', 'valor_inicial']
     search_fields = ['codigo_item', 'nome']
     list_display = ['codigo_item', 'nome', 'valor_avaliado_formatado', 'valor_inicial_formatado', 'status_pagamento', 'imagem_thumbnail']
-
+    
     fieldsets = (
         ('Status do item', {
             'fields': ('codigo_item', 'valor_arrematado', 'status_pagamento', 'status_lote'),
@@ -151,35 +96,28 @@ class BaseItemAdmin(admin.ModelAdmin):
             'fields': ('nome', 'descricao','leilao' ,'tipo_item', 'thumbnail', 'destacado')
         }),
         ('Valores', {
-            'fields': ( 'valor_avaliado', 'valor_inicial')
+            'fields': ('valor_avaliado', 'valor_inicial')
         }),
     )
 
-    # Método para exibir a miniatura da imagem na listagem
     def imagem_thumbnail(self, obj):
-        # Verifica se o item tem um atributo thumbnail
         if obj.thumbnail:
             return format_html('<img src="{}" width="50" height="50" />', obj.thumbnail.url)
         return "Sem Imagem"
 
     imagem_thumbnail.short_description = 'Imagem'
 
-    # Métodos para formatar os campos como moeda brasileira (R$)
     def valor_avaliado_formatado(self, obj):
         return locale.currency(obj.valor_avaliado, grouping=True)
 
     def valor_inicial_formatado(self, obj):
         return locale.currency(obj.valor_inicial, grouping=True)
 
-    def valor_arrematado_formatado(self, obj):
-        return locale.currency(obj.valor_arrematado, grouping=True)
-
-    # Definir os nomes para os campos formatados
     valor_avaliado_formatado.short_description = 'Valor Avaliado'
     valor_inicial_formatado.short_description = 'Valor Inicial'
-    valor_arrematado_formatado.short_description = 'Valor Arrematado'
 
 class VehicleAdmin(BaseItemAdmin):
+    inlines = [ItemImageInline]  # Aqui adicionamos o Inline de Imagens ao admin do Veículo
     list_display = BaseItemAdmin.list_display
     fieldsets = BaseItemAdmin.fieldsets + (
         ('Detalhes do Veículo', {
@@ -190,9 +128,6 @@ class VehicleAdmin(BaseItemAdmin):
         }),
     )
 
-    inlines = [VehicleItemImageInline]
-
-    # Método para formatar o valor de 'fipe' como moeda brasileira
     def fipe_formatado(self, obj):
         return locale.currency(obj.fipe, grouping=True)
 
@@ -200,6 +135,7 @@ class VehicleAdmin(BaseItemAdmin):
 
 
 class RealEstateAdmin(BaseItemAdmin):
+    inlines = [ItemImageInline]  # Adicionamos o Inline aqui também
     list_display = BaseItemAdmin.list_display
     fieldsets = BaseItemAdmin.fieldsets + (
         ('Detalhes do Imóvel', {
@@ -207,10 +143,8 @@ class RealEstateAdmin(BaseItemAdmin):
         }),
     )
 
-    inlines = [RealEstateItemImageInline]
-
-
 class RuralItemAdmin(BaseItemAdmin):
+    inlines = [ItemImageInline]  # Adicionamos o Inline aqui também
     list_display = BaseItemAdmin.list_display
     fieldsets = BaseItemAdmin.fieldsets + (
         ('Detalhes do Item Rural', {
@@ -218,21 +152,19 @@ class RuralItemAdmin(BaseItemAdmin):
         }),
     )
 
-    inlines = [RuralItemItemImageInline]
-
 
 class OtherGoodsAdmin(BaseItemAdmin):
+    inlines = [ItemImageInline]  # Adicionamos o Inline aqui também
     list_display = BaseItemAdmin.list_display
     fieldsets = BaseItemAdmin.fieldsets
 
-    inlines = [OtherGoodsItemImageInline]
-
-
+# Registrar os modelos no admin
 admin.site.register(Auction, AuctionAdmin)
 admin.site.register(Vehicle, VehicleAdmin)
 admin.site.register(RealEstate, RealEstateAdmin)
 admin.site.register(RuralItem, RuralItemAdmin)
 admin.site.register(OtherGoods, OtherGoodsAdmin)
+
 
 @admin.register(ItemType)
 class ItemTypeAdmin(admin.ModelAdmin):
@@ -244,3 +176,20 @@ class ItemTypeAdmin(admin.ModelAdmin):
             'fields': ('nome',)
         }),
     )
+
+# Registrar o modelo ItemImage no admin
+class ItemImageAdmin(admin.ModelAdmin):
+    list_display = ('id', 'descricao', 'imagem', 'get_image_preview')
+    search_fields = ('descricao',)
+    list_filter = ('descricao',)
+    
+    def get_image_preview(self, obj):
+        return f'<img src="{obj.imagem.url}" width="100" />'
+
+    get_image_preview.allow_tags = True
+    get_image_preview.short_description = 'Pré-visualização da Imagem'
+
+    fields = ('imagem', 'descricao')
+    ordering = ('descricao',)
+
+admin.site.register(ItemImage, ItemImageAdmin)

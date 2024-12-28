@@ -38,19 +38,22 @@ def profile_view(request):
         arrematante = request.user.arrematante
 
         if arrematante.tipo_cadastro == 'PF':
-            if not arrematante.documentos.filter(tipo_documento='identidade').exists():
-                documentos_pendentes.append('Identidade (RG, CNH ou Passaporte)')
-            if not arrematante.documentos.filter(tipo_documento='residencia').exists():
+            if not arrematante.documentos.filter(tipo_documento='RG').exists():
+                if not arrematante.documentos.filter(tipo_documento='CNH').exists():
+                    if not arrematante.documentos.filter(tipo_documento='PASSAPORTE').exists():
+                        documentos_pendentes.append('Identidade (RG, CNH ou Passaporte)')
+                
+            if not arrematante.documentos.filter(tipo_documento='COMPROVANTE_RESIDENCIA').exists():
                 documentos_pendentes.append('Comprovante de residência')
-            if not arrematante.documentos.filter(tipo_documento='selfie').exists():
+            if not arrematante.documentos.filter(tipo_documento='SELFIE').exists():
                 documentos_pendentes.append('Selfie')
 
         elif arrematante.tipo_cadastro == 'PJ':
-            if not arrematante.documentos.filter(tipo_documento='contrato_social').exists():
+            if not arrematante.documentos.filter(tipo_documento='CONTRATO_SOCIAL').exists():
                 documentos_pendentes.append('Contrato Social')
-            if not arrematante.documentos.filter(tipo_documento='residencia').exists():
+            if not arrematante.documentos.filter(tipo_documento='COMPROVANTE_RESIDENCIA').exists():
                 documentos_pendentes.append('Comprovante de residência')
-            if not arrematante.documentos.filter(tipo_documento='selfie').exists():
+            if not arrematante.documentos.filter(tipo_documento='SELFIE').exists():
                 documentos_pendentes.append('Selfie')
 
     return render(request, 'accounts/profile.html', {

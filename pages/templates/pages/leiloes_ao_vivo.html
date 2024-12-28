@@ -26,7 +26,6 @@
     </div>
 
     <!-- Leilões Ao Vivo -->
-
     <div class="container mt-5">
         <h2 class="text-center mb-4">Leilões Ao Vivo</h2>
         {% if live_auctions %}
@@ -34,11 +33,11 @@
                 {% for auction in live_auctions %}
                     <div class="col-md-4 mb-4">
                         <div class="card">
-                            <img src="{{ auction.imagem.url }}" class="card-img-top" alt="{{ auction.descricao }}">
+                            <img src="{{ auction.thumbnail.url }}" class="card-img-top" alt="{{ auction.descricao }}">
                             <div class="card-body">
                                 <h5 class="card-title">{{ auction.descricao|truncatewords:10 }}</h5>
                                 <p class="text-muted">Início: {{ auction.date_time|date:"d/m/Y H:i" }}</p>
-                                <a href="{% url 'leilao_detalhe' auction.codigo_leilao %}" class="btn btn-primary">
+                                <a href="{% url 'pages:leilao_detalhe' auction.codigo_leilao %}" class="btn btn-primario">
                                     Ver Detalhes
                                 </a>
                             </div>
@@ -52,7 +51,6 @@
     </div>
     
     <!-- Leilões Programados para Hoje -->
-
     <div class="container mt-5">
         <h2 class="text-center mb-4">Leilões Programados para Hoje</h2>
         {% if scheduled_auctions %}
@@ -60,11 +58,11 @@
                 {% for auction in scheduled_auctions %}
                     <div class="col-md-4 mb-4">
                         <div class="card">
-                            <img src="{{ auction.imagem.url }}" class="card-img-top" alt="{{ auction.descricao }}">
+                            <img src="{{ auction.thumbnail.url }}" class="card-img-top" alt="{{ auction.descricao }}">
                             <div class="card-body">
                                 <h5 class="card-title">{{ auction.descricao|truncatewords:10 }}</h5>
                                 <p class="text-muted">Início: {{ auction.date_time|date:"d/m/Y H:i" }}</p>
-                                <a href="{% url 'leilao_detalhe' auction.codigo_leilao %}" class="btn btn-secondary">
+                                <a href="{% url 'pages:leilao_detalhe' auction.codigo_leilao %}" class="btn btn-secondary">
                                     Ver Detalhes
                                 </a>
                             </div>
@@ -80,4 +78,3 @@
     {% include '_footer.html' %}
 </body>
 </html>
-

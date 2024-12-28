@@ -8,7 +8,7 @@
     <!-- Seção de Detalhes do Leilão -->
     <div class="container mt-5">
         <div class="text-center mb-5">
-            <h1 class="display-4">Detalhes do Leilão</h1>
+            <h1 class="display-4">Detalhes do Leilão: {{ leilao.codigo_leilao }}</h1>
             <p class="lead">{{ leilao.descricao }}</p>
         </div>
 
@@ -19,8 +19,25 @@
                     <li><strong>Data:</strong> {{ leilao.date_time|date:"d/m/Y" }}</li>
                     <li><strong>Hora:</strong> {{ leilao.date_time|time:"H:i" }}</li>
                     <li><strong>Comitente:</strong> {{ leilao.comitente }}</li>
+                    <li><strong>Categoria:</strong> {{ leilao.categoria }}</li>
                     <li><strong>Descrição:</strong> {{ leilao.descricao }}</li>
                     <li><strong>Quantidade de Lotes:</strong> {{ leilao.quantidade_lotes }}</li>
+                    <li><strong>Status:</strong> 
+                        {% if leilao.is_live %}
+                            <span class="badge bg-success">Ao vivo</span>
+                        {% elif leilao.is_scheduled_for_today %}
+                            <span class="badge bg-warning">Programado para hoje</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Não programado para hoje</span>
+                        {% endif %}
+                    </li>
+                    <li><strong>Documento Edital:</strong> 
+                        {% if leilao.documento_editais %}
+                            <a href="{{ leilao.documento_editais.url }}" target="_blank" class="btn btn-link">Baixar Edital</a>
+                        {% else %}
+                            Não disponível
+                        {% endif %}
+                    </li>
                 </ul>
             </div>
             <div class="col-md-6">
@@ -32,40 +49,50 @@
             </div>
         </div>
 
-        <!-- Seção de Itens do Leilão -->
+        <!-- Botão de Acesso ao Leilão -->
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <h3>Contagem Regressiva para o Leilão</h3>
+                <div id="countdown" class="h4 mb-4"></div>
+                {% if leilao.is_live %}
+                    <a href="/acesso-leilao/{{ leilao.codigo_leilao }}" class="btn btn-success btn-lg">Acessar Leilão Ao Vivo</a>
+                {% endif %}
+            </div>
+        </div>
+
         <div class="mt-5">
             <h3 class="text-center mb-4">Itens do Leilão</h3>
 
             <!-- Cards de Itens -->
             <div class="row">
                 {% if leilao.vehicles.exists %}
-                    <div class="col-md-12">
-                        <h4 class="text-center mb-4">Veículos</h4>
+                    <div class="col-md-12 mb-4">
+                        <h4 class="text-center">Veículos</h4>
                         <div class="row">
                             {% for item in leilao.vehicles.all %}
-                                <div class="col-md-3 mb-4">
-                                    <div class="card">
-                                        {% if item.thumbnail %}
-                                            <img src="{{ item.thumbnail.url }}" alt="{{ item.nome }}" class="card-img-top">
-                                        {% else %}
-                                            <img src="{% static 'images/default_item.jpg' %}" alt="thumbnail do Item" class="card-img-top">
-                                        {% endif %}
-                                        <div class="card-body">
-                                            <h5 class="card-title">{{ item.nome }}</h5>
-                                            <p class="card-text">{{ item.descricao }}</p>
-                                            <p class="card-text"><strong>Valor Inicial:</strong> R$ {{ item.valor_inicial|floatformat:2 }}</p>
-                                            <a href="#" class="btn btn-primary">Ver Detalhes</a>
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="card shadow-sm h-100">
+                                    <img src="{{ item.thumbnail.url }}" alt="{{ item.modelo }}" class="card-img-top">
+                                    <div class="card-body d-flex flex-column">
+                                        <h5 class="card-title">{{ item.nome }}</h5>
+                                        <p class="card-text mb-1"><strong>Ano:</strong> {{ item.fabricacao }}</p>
+                                        <p class="card-text mb-1"><strong>Modelo</strong> {{ item.modelo }}</p>
+                                        <p class="card-text mb-1"><strong>Marca:</strong> {{ item.marca }}</p>
+                                        <p class="card-text"><strong>Preço estimado:</strong> R$ {{ item.fipe|floatformat:2 }}</p>
+                                        <div class="mt-auto">
+                                        <a href="{% url 'pages:item_details' item.leilao.codigo_leilao item.codigo_item %}" class="btn btn-secondary btn-block">Ver Detalhes</a>
                                         </div>
                                     </div>
                                 </div>
+                            </div>
                             {% endfor %}
                         </div>
                     </div>
                 {% endif %}
 
                 {% if leilao.real_estates.exists %}
-                    <div class="col-md-12">
-                        <h4 class="text-center mb-4">Imóveis</h4>
+                    <div class="col-md-12 mb-4">
+                        <h4 class="text-center">Imóveis</h4>
                         <div class="row">
                             {% for item in leilao.real_estates.all %}
                                 <div class="col-md-3 mb-4">
@@ -89,8 +116,8 @@
                 {% endif %}
 
                 {% if leilao.rural_items.exists %}
-                    <div class="col-md-12">
-                        <h4 class="text-center mb-4">Bens Rurais</h4>
+                    <div class="col-md-12 mb-4">
+                        <h4 class="text-center">Bens Rurais</h4>
                         <div class="row">
                             {% for item in leilao.rural_items.all %}
                                 <div class="col-md-3 mb-4">
@@ -114,8 +141,8 @@
                 {% endif %}
 
                 {% if leilao.other_goods.exists %}
-                    <div class="col-md-12">
-                        <h4 class="text-center mb-4">Outros Bens</h4>
+                    <div class="col-md-12 mb-4">
+                        <h4 class="text-center">Outros Bens</h4>
                         <div class="row">
                             {% for item in leilao.other_goods.all %}
                                 <div class="col-md-3 mb-4">
@@ -146,5 +173,32 @@
     </div>
 
     {% include '_footer.html' %}
+
+    <script>
+        const countdownElement = document.getElementById('countdown');
+        const targetDate = new Date("{{ leilao.date_time|date:'Y-m-d H:i:s' }}");
+
+        function updateCountdown() {
+            const now = new Date();
+            const diff = targetDate - now;
+
+            if (diff <= 0) {
+                countdownElement.textContent = "Leilão iniciado!";
+                document.getElementById('countdown').innerHTML = '<a href="/acesso-leilao/{{ leilao.codigo_leilao }}" class="btn btn-success btn-lg">Acessar Leilão Ao Vivo</a>';
+                return;
+            }
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            countdownElement.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+        }
+
+        setInterval(updateCountdown, 1000);
+        updateCountdown(); // Atualiza imediatamente ao carregar
+    </script>
+
 </body>
 </html>

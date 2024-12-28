@@ -1,7 +1,6 @@
 from django.db import models
 from django.conf import settings
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
+from auction_management.models import RealEstate, Vehicle, RuralItem, OtherGoods
 
 class Bid(models.Model):
     """
@@ -13,6 +12,18 @@ class Bid(models.Model):
         related_name="bids",
         verbose_name="Usuário Arrematante"
     )
+    # Relacionamento com RealEstate
+    real_estate = models.ForeignKey(RealEstate, related_name='lances_realestate', on_delete=models.CASCADE, blank=True, null=True)
+    
+    # Relacionamento com Vehicle
+    vehicle = models.ForeignKey(Vehicle, related_name='lances_vehicle', on_delete=models.CASCADE, blank=True, null=True)
+    
+    # Relacionamento com RuralItem
+    rural_item = models.ForeignKey(RuralItem, related_name='lances_ruralitem', on_delete=models.CASCADE, blank=True, null=True)
+    
+    # Relacionamento com OtherGoods
+    other_goods = models.ForeignKey(OtherGoods, related_name='lances_othergoods', on_delete=models.CASCADE, blank=True, null=True)
+
     amount = models.DecimalField(
         max_digits=10,
         decimal_places=2,
@@ -33,13 +44,25 @@ class Bid(models.Model):
         ordering = ["-timestamp"]
 
     def __str__(self):
-        return f"Lance de {self.user} no item {self.item} - R$ {self.amount:.2f}"
+        """
+        Retorna a string representando o lance, incluindo o item associado.
+        """
+        item_instance = self.get_item_instance()
+        return f"Lance de {self.user} no item {item_instance} - R$ {self.amount:.2f}" if item_instance else f"Lance de {self.user} - R$ {self.amount:.2f}"
 
     def get_item_instance(self):
         """
-        Retorna a instância concreta do item associado usando GenericForeignKey.
+        Retorna a instância concreta do item associado ao lance.
         """
-        return self.item
+        if self.real_estate:
+            return self.real_estate
+        elif self.vehicle:
+            return self.vehicle
+        elif self.rural_item:
+            return self.rural_item
+        elif self.other_goods:
+            return self.other_goods
+        return None
 
 
 
@@ -59,15 +82,17 @@ class Payment(models.Model):
         related_name="pagamentos",
         verbose_name="Cliente Arrematante"
     )
-    # Relacionamento genérico com o modelo de item
-    content_type = models.ForeignKey(
-        ContentType,
-        on_delete=models.CASCADE,
-        related_name='pagamentos',
-        verbose_name='Tipo de Item'
-    )
-    object_id = models.PositiveIntegerField(verbose_name='ID do Item')
-    item = GenericForeignKey('content_type', 'object_id')
+    # Relacionamento com RealEstate
+    real_estate = models.ForeignKey(RealEstate, related_name='pagamentos_realestate', on_delete=models.CASCADE, blank=True, null=True)
+    
+    # Relacionamento com Vehicle
+    vehicle = models.ForeignKey(Vehicle, related_name='pagamentos_vehicle', on_delete=models.CASCADE, blank=True, null=True)
+    
+    # Relacionamento com RuralItem
+    rural_item = models.ForeignKey(RuralItem, related_name='pagamentos_ruralitem', on_delete=models.CASCADE, blank=True, null=True)
+    
+    # Relacionamento com OtherGoods
+    other_goods = models.ForeignKey(OtherGoods, related_name='pagamentos_othergoods', on_delete=models.CASCADE, blank=True, null=True)
 
     amount = models.DecimalField(
         max_digits=10,
@@ -99,11 +124,22 @@ class Payment(models.Model):
         ordering = ["-due_date"]
 
     def __str__(self):
-        return f"Pagamento de {self.user} - R$ {self.amount:.2f} - Status: {self.get_status_display()}"
+        """
+        Retorna a string representando o pagamento, incluindo o item associado.
+        """
+        item_instance = self.get_item_instance()
+        return f"Pagamento de {self.user} - R$ {self.amount:.2f} - Status: {self.get_status_display()} - Item: {item_instance}" if item_instance else f"Pagamento de {self.user} - R$ {self.amount:.2f} - Status: {self.get_status_display()}"
 
-    @property
     def get_item_instance(self):
         """
-        Retorna a instância concreta do item associado usando GenericForeignKey.
+        Retorna a instância concreta do item associado ao pagamento.
         """
-        return self.item
+        if self.real_estate:
+            return self.real_estate
+        elif self.vehicle:
+            return self.vehicle
+        elif self.rural_item:
+            return self.rural_item
+        elif self.other_goods:
+            return self.other_goods
+        return None

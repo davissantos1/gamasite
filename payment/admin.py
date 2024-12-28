@@ -40,8 +40,8 @@ class PaymentAdmin(admin.ModelAdmin):
     list_display = (
         'id', 'user', 'item_display', 'amount', 'status', 'due_date', 'payment_date', 'created_at'
     )
-    list_filter = ('status', 'due_date', 'created_at', 'content_type')
-    search_fields = ('user__username', 'user__email', 'content_type__model', 'object_id')
+    list_filter = ('status', 'due_date', 'created_at',)
+    search_fields = ('user__username', 'user__email', )
     ordering = ('-due_date', '-created_at')
     date_hierarchy = 'due_date'
     readonly_fields = ('created_at', 'payment_date')
@@ -50,14 +50,14 @@ class PaymentAdmin(admin.ModelAdmin):
         """
         Retorna uma representação amigável do item associado ao pagamento.
         """
-        item_instance = obj.get_item_instance
+        item_instance = obj.get_item_instance()
         return str(item_instance) if item_instance else "Item não encontrado"
     item_display.short_description = 'Item Relacionado'
 
     fieldsets = (
         ("Informações do Pagamento", {
             "fields": (
-                'user', 'content_type', 'object_id', 'amount', 'status', 
+                'user', 'amount', 'status', 
                 'payment_date', 'due_date', 'created_at'
             )
         }),
