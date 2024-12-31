@@ -54,13 +54,33 @@
                     </ul>
                 </li>
 
-                <!-- Leilões -->
-                <li class="nav-item">
-                    <a href="{% url 'admin:auction_management_auction_changelist' %}" class="nav-link">
+                <!-- Submenu Leilões -->
+                <li class="nav-item has-treeview">
+                    <a href="" class="nav-link">
                         <i class="nav-icon fas fa-gavel"></i>
-                        <p>Leilões</p>
+                        <p>
+                            Leilões
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
                     </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{% url 'admin:auction_management_auction_changelist' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Gerenciar leilões</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'admin-ao-vivo' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Leilões ao vivo</p>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
+
+                <!-- Leilões -->
+                
 
                 <!-- Submenu Itens -->
                 <li class="nav-item has-treeview">

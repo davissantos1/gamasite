@@ -10,6 +10,7 @@ urlpatterns = [
     path('leiloes_ao_vivo/', views.leiloes_ao_vivo, name='leiloes_ao_vivo'),
     path('calendario/', views.calendario, name='calendario'),
     path('leilao/<str:codigo_leilao>/<str:codigo_item>/', views.item_details, name='item_details'),
+    path('leilao/<str:codigo_leilao>/ao-vivo', views.ao_vivo, name='ao_vivo'),
     path('leilao/<str:codigo_leilao>/', views.leilao_detalhe, name='leilao_detalhe'),
     path('dashboard/inicio/', views.inicio, name='inicio'),
     path('dashboard/lotes/', views.lotes, name='lotes'),

@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}Leilão Ao Vivo - {{ auction.codigo_leilao }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <h1 class="display-4">{{ auction.descricao }}</h1>
+            <p><strong>Status:</strong> {{ auction.status }}</p>
+            <p><strong>Comitente:</strong> {{ auction.comitente }}</p>
+            <p><strong>Data do Leilão:</strong> {{ auction.date_time|date:"d/m/Y H:i" }}</p>
+
+            <!-- Transmissão ao Vivo -->
+            <div class="live-auction mb-4">
+                <h2 class="h4 mb-3">Transmissão Ao Vivo</h2>
+                {% if auction.transmissao_ao_vivo %}
+                    <div class="alert alert-info" role="alert">
+                        O leilão está ao vivo. Clique para assistir!
+                    </div>
+                    <div class="video-player">
+                        <video width="100%" height="500" controls>
+                            <source src="{{ auction.transmissao_ao_vivo.url }}" type="video/mp4">
+                            Seu navegador não suporta vídeo.
+                        </video>
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning" role="alert">
+                        Não há transmissão ao vivo disponível neste momento.
+                    </div>
+                {% endif %}
+            </div>
+
+            <hr>
+
+            <!-- Itens do Leilão -->
+            <div class="auction-items">
+                <h3 class="h4 mb-3">Itens em Leilão</h3>
+                {% for item in auction.items %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h4 class="card-title">{{ item.nome }} - {{ item.tipo }}</h4>
+                            <img src="{{ item.thumbnail.url }}" alt="{{ item.nome }}" class="img-fluid mb-3">
+                            <p>{{ item.descricao }}</p>
+                            <p><strong>Valor Inicial:</strong> R$ {{ item.valor_inicial|floatformat:2 }}</p>
+                            <p><strong>Valor Avaliado:</strong> R$ {{ item.valor_avaliado|floatformat:2 }}</p>
+                            
+                            <!-- Formulário de Lance -->
+                            <form action="{% url 'pages:create_bid' item.leilao.codigo_leilao item.codigo_item %}" method="POST">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <label for="lance">Seu lance (R$):</label>
+                                    <input type="number" name="lance" class="form-control" min="{{ item.valor_inicial }}" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Fazer Lance</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="auction-details card mb-4">
+                <div class="card-body">
+                    <h4 class="card-title">Detalhes do Leilão</h4>
+                    <ul class="list-unstyled">
+                        <li><strong>Categoria:</strong> {{ auction.categoria.nome }}</li>
+                        <li><strong>Data e Hora:</strong> {{ auction.date_time|date:"d/m/Y H:i" }}</li>
+                        <li><strong>Duração:</strong> {{ auction.duration_hours }} horas</li>
+                        <li><strong>Status:</strong> {{ auction.status }}</li>
+                    </ul>
+                    {% if auction.documento_editais %}
+                        <a href="{{ auction.documento_editais.url }}" class="btn btn-info" target="_blank">Baixar Edital</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

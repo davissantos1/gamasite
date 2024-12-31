@@ -55,7 +55,7 @@
                 <h3>Contagem Regressiva para o Leilão</h3>
                 <div id="countdown" class="h4 mb-4"></div>
                 {% if leilao.is_live %}
-                    <a href="/acesso-leilao/{{ leilao.codigo_leilao }}" class="btn btn-success btn-lg">Acessar Leilão Ao Vivo</a>
+                    <a href="{% url 'pages:ao_vivo' leilao.codigo_leilao %}" class="btn btn-success btn-lg">Acessar Leilão Ao Vivo</a>
                 {% endif %}
             </div>
         </div>
@@ -184,7 +184,7 @@
 
             if (diff <= 0) {
                 countdownElement.textContent = "Leilão iniciado!";
-                document.getElementById('countdown').innerHTML = '<a href="/acesso-leilao/{{ leilao.codigo_leilao }}" class="btn btn-success btn-lg">Acessar Leilão Ao Vivo</a>';
+                document.getElementById('countdown').innerHTML = '<a href="{% url 'pages:ao_vivo' leilao.codigo_leilao %}" class="btn btn-success btn-lg">Acessar Leilão Ao Vivo</a>';
                 return;
             }
 

@@ -1,0 +1,33 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block content %}
+<h1>Leilões Programados</h1>
+
+{% if leiloes_programados %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Código do Leilão</th>
+                <th>Descrição</th>
+                <th>Data e Hora</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for leilao in leiloes_programados %}
+            <tr>
+                <td>{{ leilao.codigo_leilao }}</td>
+                <td>{{ leilao.descricao }}</td>
+                <td>{{ leilao.date_time|date:"d/m/Y H:i" }}</td>
+                <td>
+                    <a href="{% url 'iniciar_ao_vivo' leilao.codigo_leilao %}" class="btn btn-success">Iniciar Ao Vivo</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>Não há leilões programados no momento.</p>
+{% endif %}
+{% endblock %}

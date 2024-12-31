@@ -10,6 +10,8 @@ from payment.models import Payment, Bid
 from django.contrib import messages
 from django.utils.timezone import localtime
 from django.utils import timezone
+from django.http import HttpResponseForbidden
+
 
 
 def index(request):
@@ -138,6 +140,32 @@ def item_details(request, codigo_leilao, codigo_item):
 def leilao_detalhe(request, codigo_leilao):
     leilao = get_object_or_404(Auction, codigo_leilao=codigo_leilao)  # Usar codigo_leilao
     return render(request, 'pages/leilao_detalhe.html', {'leilao': leilao, 'now': timezone.now()})
+
+def ao_vivo(request, codigo_leilao):
+    # Obtém o leilão com o código especificado
+    auction = get_object_or_404(Auction, codigo_leilao=codigo_leilao)
+    
+    # Verifica se o status do leilão é "ao_vivo"
+    if auction.status != 'ao_vivo':
+        return HttpResponseForbidden("O leilão não está ao vivo no momento.")
+
+    # Busca todos os itens associados ao leilão
+    vehicles = Vehicle.objects.filter(leilao=auction)
+    real_estates = RealEstate.objects.filter(leilao=auction)
+    rural_items = RuralItem.objects.filter(leilao=auction)
+    other_goods = OtherGoods.objects.filter(leilao=auction)
+
+    # Contexto para o template
+    context = {
+        'auction': auction,
+        'vehicles': vehicles,
+        'real_estates': real_estates,
+        'rural_items': rural_items,
+        'other_goods': other_goods
+    }
+
+    # Renderiza a página ao vivo com todos os itens
+    return render(request, 'pages/ao_vivo.html', context)
 
 
 @login_required

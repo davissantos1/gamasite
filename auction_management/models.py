@@ -121,6 +121,7 @@ class Auction(models.Model):
     )
     thumbnail = models.ImageField(upload_to=generate_auction_thumb_path, default='default/default_image.jpg')
     documento_editais = models.FileField(upload_to='editais/', null=True, blank=True, verbose_name="Documento Edital (PDF)")
+    ao_vivo_iniciado = models.BooleanField(default=False, verbose_name="Leilão Ao Vivo Iniciado")
 
     @property
     def is_scheduled_for_today(self):
@@ -159,6 +160,7 @@ class Auction(models.Model):
     class Meta:
         verbose_name = "Leilão"
         verbose_name_plural = "Leilões"
+
 
 class BaseItem(models.Model):
     nome = models.CharField(

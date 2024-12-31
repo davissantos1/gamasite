@@ -1,0 +1,52 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block content %}
+<h1>Leilão Ao Vivo - {{ auction.codigo_leilao }}</h1>
+
+<p><strong>Descrição:</strong> {{ auction.descricao }}</p>
+<p><strong>Status:</strong> {{ auction.status }}</p>
+<p><strong>Data e Hora de Início:</strong> {{ auction.date_time|date:"d/m/Y H:i" }}</p>
+
+<!-- Campo de transmissão ao vivo -->
+<h3>Transmissão ao Vivo</h3>
+<div class="live-stream">
+    <video controls width="100%">
+        <source src="{{ auction.transmissao_video_url }}" type="video/mp4"> 
+        Seu navegador não suporta vídeo HTML5.
+    </video>
+</div>
+
+<!-- Exibição do item atual -->
+<h3>Item em Leilão: {{ auction.vehicles.first.nome }}</h3> <!-- Alterado para mostrar o primeiro item -->
+<div class="auction-item">
+    <h4>{{ auction.vehicles.first.nome }} - Veículo</h4>
+    <img src="{{ auction.vehicles.first.thumbnail.url }}" alt="{{ auction.vehicles.first.nome }}" class="img-thumbnail" style="width: 200px;">
+    <p>{{ auction.vehicles.first.descricao }}</p>
+    <p><strong>Valor Inicial:</strong> R$ {{ auction.vehicles.first.valor_inicial|floatformat:2 }}</p>
+
+    <!-- Exibição dos lances realizados -->
+    <h4>Lances Realizados:</h4>
+    <ul>
+        {% for bid in auction.vehicles.first.bids.all %}
+            <li><strong>{{ bid.usuario.username }}:</strong> R$ {{ bid.valor|floatformat:2 }}</li>
+        {% empty %}
+            <li>Não houve lances ainda.</li>
+        {% endfor %}
+    </ul>
+
+    <!-- Formulário para definir o lance vencedor -->
+    <form action="" method="POST">
+        {% csrf_token %}
+        <label for="lance_vencedor">Definir Lance Vencedor (R$):</label>
+        <input type="number" name="lance_vencedor" min="{{ auction.vehicles.first.valor_inicial }}" required>
+        <button type="submit" class="btn btn-success">Definir Vencedor</button>
+    </form>
+
+    <!-- Botões de navegação -->
+    <div class="mt-3">
+        <a href="{% url 'proximo_item_leilao' auction.codigo_leilao %}" class="btn btn-primary">Próximo Item</a>
+    </div>
+</div>
+
+{% endblock %}
