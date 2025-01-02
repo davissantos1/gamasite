@@ -4,59 +4,86 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1 class="mb-4">Meus Lances</h1>
+    <h1 class="text-primario mb-4">Meus Lances</h1>
 
     <!-- Campo de Filtro -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-header bg-light">
-            <h5>Filtrar Lances</h5>
+    <div class="card shadow-sm mb-5 border-0">
+        <div class="card-header bg-primario text-white">
+            <h5 class="mb-0">Filtrar Lances</h5>
         </div>
         <div class="card-body">
             <form method="get">
-                <div class="form-row">
-                    <div class="form-group col-md-4">
-                        <label for="filter-status">Status</label>
-                        <select class="form-control" id="filter-status" name="status">
+                <div class="row g-3">
+                    <div class="col-md-4 mt-3">
+                        <label for="filter-status" class="form-label">Validade</label>
+                        <select class="form-select" id="filter-status" name="status">
                             <option value="">Todos</option>
-                            <option value="ativo">Ativos</option>
-                            <option value="vencido">Vencidos</option>
-                            <option value="arrematado">Arrematados</option>
+                            <option value="true">Válidos</option>
+                            <option value="false">Inválidos</option>
                         </select>
                     </div>
-                    <div class="form-group col-md-4">
-                        <label for="filter-date">Data</label>
+                    <div class="col-md-4">
+                        <label for="filter-date" class="form-label">Data</label>
                         <input type="date" class="form-control" id="filter-date" name="date">
                     </div>
-                    <div class="form-group col-md-4 align-self-end">
-                        <button type="submit" class="btn btn-primary btn-block">Filtrar</button>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primario w-100 shadow text-white">Filtrar</button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Lista de Lances -->
-    <div class="row">
-        {% if lances.exists %}
-            {% for lance in lances %}
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <img src="{{ lance.lote.imagem.url }}" class="card-img-top" alt="{{ lance.lote.nome }}">
-                        <div class="card-body">
-                            <h5 class="card-title">Lote: {{ lance.lote.nome }}</h5>
-                            <p><strong>Valor do Lance:</strong> R$ {{ lance.valor }}</p>
-                            <p><strong>Status:</strong> {{ lance.status }}</p>
-                            <p><strong>Data:</strong> {{ lance.data|date:"d/m/Y H:i" }}</p>
-                            <a href="{% url 'pages:detalhes_lote' lance.lote.id %}" class="btn btn-primary">Ver Lote</a>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-        {% else %}
-            <div class="col-12">
-                <p class="text-muted">Nenhum lance encontrado para os critérios selecionados.</p>
+    <!-- Tabela de Lances -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="text-white bg-primario">
+                        <tr>
+                            <th>#</th>
+                            <th>Item</th>
+                            <th>Valor do Lance</th>
+                            <th>Data</th>
+                            <th>Validade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if lances %}
+                            {% for lance in lances %}
+                                <tr>
+                                    <td class="fw-bold">{{ forloop.counter }}</td>
+                                    <td>
+                                        {% if lance.real_estate %}
+                                            Imóvel: {{ lance.real_estate.nome }}
+                                        {% elif lance.vehicle %}
+                                            Veículo: {{ lance.vehicle.nome }}
+                                        {% elif lance.rural_item %}
+                                            Item Rural: {{ lance.rural_item.nome }}
+                                        {% elif lance.other_goods %}
+                                            Outros Bens: {{ lance.other_goods.nome }}
+                                        {% endif %}
+                                    </td>
+                                    <td>R$ {{ lance.amount }}</td>
+                                    <td>{{ lance.timestamp|date:"d/m/Y H:i" }}</td>
+                                    <td>
+                                        {% if lance.is_valid %}
+                                            <span class="badge bg-success">Válido</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Inválido</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">Nenhum lance encontrado.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
             </div>
-        {% endif %}
+        </div>
     </div>
 </div>
 {% endblock %}

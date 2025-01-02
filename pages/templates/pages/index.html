@@ -4,6 +4,7 @@
 {% include '_head.html' %}
 <body>
     {% include '_header.html' %}
+    {% load index_filters %}
 
     <!-- Carrossel de Banners -->
     <div id="mainCarousel" class="carousel slide mb-5" data-bs-ride="carousel" data-bs-interval="5000" style="max-height: 400px; overflow: hidden;">
@@ -59,7 +60,7 @@
         <div class="container">
             <!-- Loop para as categorias de itens em destaque -->
             {% for categoria, itens in itens_destacados.items %}
-                <h2 class="text-center mb-4">{{ categoria }} em Destaque</h2>
+                <h2 class="text-center mb-4">{{ categoria|replace_underscore }} em Destaque</h2>
                 <div class="row">
                     {% if itens %}
                         {% for item in itens %}

@@ -167,18 +167,103 @@ def ao_vivo(request, codigo_leilao):
     # Renderiza a página ao vivo com todos os itens
     return render(request, 'pages/ao_vivo.html', context)
 
-
 @login_required
 def inicio(request):
-    return render(request, 'pages/dashboard/inicio.html')
+    # Busca todos os lances do usuário, incluindo as relações necessárias
+    lances_usuario = Bid.objects.filter(user=request.user).select_related(
+        'real_estate', 'vehicle', 'rural_item', 'other_goods'
+    )
+
+    lotes = []
+    lances_detalhados = []  # Lista para armazenar os lances detalhados
+
+    for lance in lances_usuario:
+        item = None
+        tipo_item = None
+
+        # Verifica o tipo do item e atribui
+        if lance.real_estate:
+            item = lance.real_estate
+            tipo_item = 'Imóvel'
+        elif lance.vehicle:
+            item = lance.vehicle
+            tipo_item = 'Veículo'
+        elif lance.rural_item:
+            item = lance.rural_item
+            tipo_item = 'Item Rural'
+        elif lance.other_goods:
+            item = lance.other_goods
+            tipo_item = 'Outros Bens'
+
+        if item:
+            lote = {
+                'item': item,
+                'tipo': tipo_item,
+                'valor_lance': lance.amount,
+                'data': lance.timestamp,
+                'imagem': getattr(item, 'thumbnail', None), 
+            }
+            lotes.append(lote)
+
+            # Adiciona o lance detalhado à lista
+            maior_lance = Bid.get_highest_bid(item)  # Obtém o maior lance associado ao item
+            lance_detalhado = {
+                'tipo': tipo_item,
+                'item_nome': item.nome if hasattr(item, 'nome') else str(item),
+                'valor_lance': lance.amount,
+                'data_lance': lance.timestamp,
+                'is_valid': lance.is_valid,  # Validade do lance
+                'maior_lance': maior_lance.amount if maior_lance else None  # Maior lance
+            }
+            lances_detalhados.append(lance_detalhado)
+
+    # Coletar os IDs dos leilões associados aos lotes
+    leiloes_ids = set(lote['item'].leilao.codigo_leilao for lote in lotes if hasattr(lote['item'], 'leilao'))
+
+    # Buscar os leilões com os IDs coletados
+    leiloes = Auction.objects.filter(codigo_leilao__in=leiloes_ids)
+
+    # Contexto para o template
+    context = {
+        'lances': lances_detalhados,  # Passa a lista detalhada dos lances
+        'lotes': lotes,  # Dados detalhados dos lotes
+        'leiloes': leiloes,  # Dados dos leilões associados
+    }
+
+    return render(request, 'pages/dashboard/inicio.html', context)
+
+
 
 @login_required
 def lotes(request):
-    return render(request, 'pages/dashboard/lotes.html')
+    # Obter lances do usuário atual
+    lances_usuario = Bid.objects.filter(user=request.user).select_related(
+        'real_estate', 'vehicle', 'rural_item', 'other_goods'
+    )
+    
+    # Criar uma lista com os itens baseados nos lances
+    lotes = []
+    for lance in lances_usuario:
+        if lance.real_estate:
+            lotes.append({'item': lance.real_estate, 'tipo': 'Imóvel', 'valor_lance': lance.amount, 'data': lance.timestamp})
+        elif lance.vehicle:
+            lotes.append({'item': lance.vehicle, 'tipo': 'Veículo', 'valor_lance': lance.amount, 'data': lance.timestamp})
+        elif lance.rural_item:
+            lotes.append({'item': lance.rural_item, 'tipo': 'Item Rural', 'valor_lance': lance.amount, 'data': lance.timestamp})
+        elif lance.other_goods:
+            lotes.append({'item': lance.other_goods, 'tipo': 'Outros Bens', 'valor_lance': lance.amount, 'data': lance.timestamp})
+    
+    # Passar dados para o template
+    return render(request, 'pages/dashboard/lotes.html', {'lotes': lotes})
+
 
 @login_required
 def lances(request):
-    return render(request, 'pages/dashboard/lances.html')
+    lances_usuario = Bid.objects.filter(user=request.user).select_related(
+        'real_estate', 'vehicle', 'rural_item', 'other_goods'
+    )
+    return render(request, 'pages/dashboard/lances.html', {'lances': lances_usuario})
+
 
 @login_required
 def financeiro_cliente(request):
@@ -219,6 +304,14 @@ def create_bid(request, codigo_leilao, codigo_item):
             messages.error(request, "O valor do lance deve ser numérico.")
             return redirect('pages:item_details', codigo_leilao=codigo_leilao, codigo_item=codigo_item)
 
+        # Buscar o arrematante
+        arrematante = request.user.arrematante
+
+        # Verificar se o arrematante pode dar lances
+        if not arrematante.pode_dar_lance:
+            messages.error(request, "Você não pode dar lances até enviar todos os documentos necessários.")
+            return redirect('pages:item_details', codigo_leilao=codigo_leilao, codigo_item=codigo_item)
+
         # Buscar o leilão
         leilao = get_object_or_404(Auction, codigo_leilao=codigo_leilao)
 
@@ -254,6 +347,7 @@ def create_bid(request, codigo_leilao, codigo_item):
 
     messages.error(request, "Método inválido.")
     return redirect('pages:home')
+
 
 
 def financeiro(request):

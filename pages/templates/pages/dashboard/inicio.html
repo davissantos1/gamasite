@@ -70,81 +70,113 @@
 
         <!-- Conteúdo principal -->
         <div class="col-md-9">
-            <!-- Card: Leilões -->
+            <!-- Tabela: Leilões -->
             <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
+                <div class="card-header bg-primario text-white">
                     <h5>Leilões</h5>
                 </div>
                 <div class="card-body">
                     {% if leiloes.exists %}
-                        <div class="row">
-                            {% for leilao in leiloes %}
-                                <div class="col-md-6 mb-4">
-                                    <div class="card">
-                                        <img src="{{ leilao.imagem.url }}" class="card-img-top" alt="{{ leilao.nome }}">
-                                        <div class="card-body">
-                                            <h5 class="card-title">{{ leilao.nome }}</h5>
-                                            <p class="card-text">{{ leilao.descricao|truncatewords:15 }}</p>
-                                            <a href="{% url 'pages:detalhes_leilao' leilao.id %}" class="btn btn-primary">Ver Detalhes</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
+                        <table class="table table-striped table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Comitente</th>
+                                    <th>Descrição</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for leilao in leiloes %}
+                                    <tr>
+                                        <td>{{ leilao.codigo_leilao }}</td>
+                                        <td>{{ leilao.comitente }}</td>
+                                        <td>{{ leilao.descricao|truncatewords:10 }}</td>
+                                        <td>
+                                            <span class="badge {% if leilao.status == 'ativo' %}bg-success{% else %}bg-danger{% endif %}">
+                                                {{ leilao.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td><a href="#" class="btn btn-primary btn-sm">Ver Detalhes</a></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     {% else %}
                         <p>Você não tem leilões disponíveis no momento.</p>
                     {% endif %}
                 </div>
             </div>
 
-            <!-- Card: Lotes -->
+            <!-- Tabela: Lotes -->
             <div class="card shadow-sm mb-4">
-                <div class="card-header bg-success text-white">
+                <div class="card-header bg-primario text-white">
                     <h5>Lotes</h5>
                 </div>
                 <div class="card-body">
-                    {% if lotes.exists %}
-                        <div class="row">
-                            {% for lote in lotes %}
-                                <div class="col-md-6 mb-4">
-                                    <div class="card">
-                                        <img src="{{ lote.imagem.url }}" class="card-img-top" alt="{{ lote.nome }}">
-                                        <div class="card-body">
-                                            <h5 class="card-title">{{ lote.nome }}</h5>
-                                            <p class="card-text">{{ lote.descricao|truncatewords:15 }}</p>
-                                            <a href="{% url 'pages:detalhes_lote' lote.id %}" class="btn btn-success">Ver Detalhes</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
+                    {% if lotes %}
+                        <table class="table table-striped table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Imagem</th>
+                                    <th>Nome</th>
+                                    <th>Descrição</th>
+                                    <th>Código</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for lote in lotes %}
+                                    <tr>
+                                        <td><img src="{{ lote.imagem.url }}" alt="{{ lote.item.nome }}" width="100"></td>
+                                        <td>{{ lote.item.nome }}</td>
+                                        <td>{{ lote.item.descricao|truncatewords:10 }}</td>
+                                        <td>{{ lote.item.codigo_item }}</td>
+                                        <td><a href="#" class="btn btn-success btn-sm">Ver Detalhes</a></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     {% else %}
                         <p>Você não tem lotes disponíveis no momento.</p>
                     {% endif %}
                 </div>
             </div>
 
-            <!-- Card: Lances -->
+            <!-- Tabela: Lances -->
             <div class="card shadow-sm mb-4">
-                <div class="card-header bg-warning text-dark">
+                <div class="card-header bg-primario text-white">
                     <h5>Meus Lances</h5>
                 </div>
                 <div class="card-body">
-                    {% if lances.exists %}
-                        <div class="row">
-                            {% for lance in lances %}
-                                <div class="col-md-6 mb-4">
-                                    <div class="card">
-                                        <img src="{{ lance.lote.imagem.url }}" class="card-img-top" alt="{{ lance.lote.nome }}">
-                                        <div class="card-body">
-                                            <h5 class="card-title">Lote: {{ lance.lote.nome }}</h5>
-                                            <p class="card-text">Valor do Lance: R$ {{ lance.valor }}</p>
-                                            <a href="{% url 'pages:detalhes_lote' lance.lote.id %}" class="btn btn-warning">Ver Lote</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
+                    {% if lances %}
+                        <table class="table table-striped table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Lote</th>
+                                    <th>Valor do Lance</th>
+                                    <th>Maior Lance</th>
+                                    <th>Data</th>
+                                    <th>Lance Válido</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for lance in lances %}
+                                    <tr>
+                                        <td>{{ lance.item_nome }}</td>
+                                        <td>R$ {{ lance.valor_lance }}</td>
+                                        <td>R$ {{ lance.maior_lance }}</td>
+                                        <td>{{ lance.data_lance|date:"d/m/Y H:i" }}</td>
+                                        <td>
+                                            <span class=" badge {% if lance.is_valid %}bg-success{% else %}bg-danger{% endif %}">
+                                                {% if lance.is_valid %}Válido{% else %}Inválido{% endif %}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     {% else %}
                         <p>Você não tem lances ativos no momento.</p>
                     {% endif %}

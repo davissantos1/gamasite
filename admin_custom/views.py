@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Sum 
-from auction_management.models import RuralItem, RealEstate, Vehicle, OtherGoods, Auction
+from auction_management.models import RuralItem, RealEstate, Vehicle, OtherGoods, Auction, ItemImage
 from payment.models import Bid, Payment
 
 
@@ -41,40 +41,65 @@ def admin_dashboard(request):
 
 @staff_member_required
 def admin_ao_vivo(request):
-    # Apenas leilões com status 'programado' para serem iniciados
+    # Leilões programados
     leiloes_programados = Auction.objects.filter(status='programado')
-    return render(request, 'admin/live_auctions.html', {'leiloes_programados': leiloes_programados})
+    # Leilões ao vivo
+    leiloes_ao_vivo = Auction.objects.filter(status='ao_vivo')
+    
+    return render(
+        request,
+        'admin/live_auctions.html',
+        {
+            'leiloes_programados': leiloes_programados,
+            'leiloes_ao_vivo': leiloes_ao_vivo,
+        }
+    )
 
 @staff_member_required
-def iniciar_ao_vivo(request, codigo_leilao):
+def gerenciar_ao_vivo(request, codigo_leilao):
     # Recupera o leilão que foi iniciado
-    auction = Auction.objects.get(codigo_leilao=codigo_leilao)
+    try:
+        auction = Auction.objects.get(codigo_leilao=codigo_leilao)
+    except Auction.DoesNotExist:
+        return redirect('admin-ao-vivo')  # Redireciona se o leilão não existir
 
-    # Se o leilão não está programado ou já foi finalizado, redireciona
+    # Verifica se o status do leilão permite acesso a esta página
     if auction.status not in ['programado', 'ao_vivo']:
         return redirect('admin-ao-vivo')
 
-    # Inicia o leilão ao vivo e muda seu status
-    auction.status = 'ao_vivo'
-    auction.ao_vivo_iniciado = True
-    auction.save()
+    # Se o leilão estiver programado, muda o status para "ao_vivo"
+    if auction.status == 'programado':
+        auction.status = 'ao_vivo'
+        auction.ao_vivo_iniciado = True
+        auction.save()
+        
 
-    # Aqui você pode adicionar lógica para passar os itens do leilão, definir vencedor, etc.
+    # Recupera os itens associados ao leilão
+    items = {
+        'vehicles': auction.vehicles.all(),
+        'real_estates': auction.real_estates.all(),
+        'rural_items': auction.rural_items.all(),
+        'other_goods': auction.other_goods.all(),
+    }
 
-    return render(request, 'admin/begin_live_auctions.html', {'auction': auction})
+    # Adiciona os lances para cada tipo de item
+    bids = {
+        'vehicles': Bid.objects.filter(vehicle__in=items['vehicles'], is_valid=True).order_by('-amount'),
+        'real_estates': Bid.objects.filter(real_estate__in=items['real_estates'], is_valid=True).order_by('-amount'),
+        'rural_items': Bid.objects.filter(rural_item__in=items['rural_items'], is_valid=True).order_by('-amount'),
+        'other_goods': Bid.objects.filter(other_goods__in=items['other_goods'], is_valid=True).order_by('-amount'),
+    }
 
-@staff_member_required
-def finalizar_leilao(request, codigo_leilao):
-    auction = Auction.objects.get(codigo_leilao=codigo_leilao)
-    auction.status = 'finalizado'
-    auction.save()
-    return redirect('admin-ao-vivo')
+    # Determina o maior lance por tipo de item
+    highest_bids = {key: value.first() for key, value in bids.items()}
 
-@staff_member_required
-def proximo_item_leilao(request, codigo_leilao):
-    auction = Auction.objects.get(codigo_leilao=codigo_leilao)
-    # Lógica para determinar o próximo item
-    next_item = auction.vehicles.all().first()  # Exemplo de lógica simples, pode ser mais complexa
-    return render(request, 'admin/begin_live_auctions.html', {'auction': auction, 'current_item': next_item})
+    # Renderiza o template com os dados necessários
+    return render(request, 'admin/manage_live_auctions.html', {
+        'auction': auction,
+        'items': items,
+        'bids': bids,
+        'highest_bids': highest_bids,
+    })
+
 
 

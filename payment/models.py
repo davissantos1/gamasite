@@ -64,6 +64,24 @@ class Bid(models.Model):
             return self.other_goods
         return None
 
+    @staticmethod
+    def get_highest_bid(item_instance):
+        """
+        Retorna o lance com o maior valor para um determinado item (Imóvel, Veículo, Item Rural, Outros Bens).
+        """
+        if isinstance(item_instance, RealEstate):
+            highest_bid = Bid.objects.filter(real_estate=item_instance).order_by('-amount').first()
+        elif isinstance(item_instance, Vehicle):
+            highest_bid = Bid.objects.filter(vehicle=item_instance).order_by('-amount').first()
+        elif isinstance(item_instance, RuralItem):
+            highest_bid = Bid.objects.filter(rural_item=item_instance).order_by('-amount').first()
+        elif isinstance(item_instance, OtherGoods):
+            highest_bid = Bid.objects.filter(other_goods=item_instance).order_by('-amount').first()
+        else:
+            highest_bid = None
+        return highest_bid
+
+
 
 
 class Payment(models.Model):

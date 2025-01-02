@@ -8,55 +8,61 @@
     <!-- Seção de Detalhes do Item -->
     <div class="container mt-5">
         <!-- Título -->
-        <div class="text-center">
+        <div class="text-center mb-5">
             <h1 class="display-4 text-primario">Detalhes do Item</h1>
             <p class="lead text-muted">{{ item.nome }}</p>
         </div>
 
         <!-- Imagens e Informações -->
-        <div class="row mt-4">
+        <div class="row">
+            <!-- Carrossel de Imagens -->
             <div class="col-lg-6">
-                <!-- Carrossel de Imagens -->
                 <div id="itemImagesCarousel" class="carousel slide" data-bs-ride="carousel">
                     <div class="carousel-inner">
                         {% if item.thumbnail %}
                             <div class="carousel-item active">
-                                <img src="{{ item.thumbnail.url }}" class="d-block w-100 rounded shadow-sm" alt="Imagem principal do item">
+                                <img src="{{ item.thumbnail.url }}" class="d-block w-100 rounded shadow-lg" alt="Imagem principal do item">
                             </div>
                         {% else %}
                             <div class="carousel-item active">
-                                <img src="{% static 'images/default_item.jpg' %}" class="d-block w-100 rounded shadow-sm" alt="Imagem padrão">
+                                <img src="{% static 'images/default_item.jpg' %}" class="d-block w-100 rounded shadow-lg" alt="Imagem padrão">
                             </div>
                         {% endif %}
                         
                         {% for imagem in images %}
                             <div class="carousel-item">
-                                <img src="{{ imagem.imagem.url }}" class="d-block w-100 rounded shadow-sm" alt="Imagem adicional do item">
+                                <img src="{{ imagem.imagem.url }}" class="d-block w-100 rounded shadow-lg" alt="Imagem adicional do item">
                             </div>
                         {% empty %}
                             <div class="carousel-item active">
-                                <img src="{% static 'images/default_item.jpg' %}" class="d-block w-100 rounded shadow-sm" alt="Imagem padrão">
+                                <img src="{% static 'images/default_item.jpg' %}" class="d-block w-100 rounded shadow-lg" alt="Imagem padrão">
                             </div>
                         {% endfor %}
                     </div>
-                    <!-- Botões de navegação do carrossel -->
-                    <button class="carousel-control-prev" type="button" data-bs-target="#itemImagesCarousel" data-bs-slide="prev" style="background: transparent; border: none;">
-                        <span class="carousel-control-prev-icon" aria-hidden="true" style="filter: opacity(0.5);"><</span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#itemImagesCarousel" data-bs-slide="next" style="background: transparent; border: none;">
-                        <span class="carousel-control-next-icon" aria-hidden="true" style="filter: opacity(0.5);">></span>
-                    </button>
+
+                   <!-- Botões de navegação do carrossel -->
+                   <button class="carousel-control-prev" type="button" data-bs-target="#itemImagesCarousel" data-bs-slide="prev" style="background: transparent; border: none;">
+                    <span class="carousel-control-prev-icon" aria-hidden="true" style="filter: opacity(0.5);"><</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#itemImagesCarousel" data-bs-slide="next" style="background: transparent; border: none;">
+                    <span class="carousel-control-next-icon" aria-hidden="true" style="filter: opacity(0.5);">></span>
+                </button>
                 </div>
 
                 <!-- Formulário de Lance -->
-                <div class="p-4">
+                <div class="mt-4">
+                    {% if not request.user.arrematante.pode_dar_lance %}
+                        <div class="alert alert-warning" role="alert">
+                            Você não pode dar lances até enviar todos os documentos necessários.
+                        </div>
+                    {% endif %}
                     <form method="POST" action="{% url 'pages:create_bid' leilao.codigo_leilao item.codigo_item %}">
                         {% csrf_token %}
                         <div class="input-group">
                             <input type="number" step="0.01" 
-                                   min="{% if highest_bid %}{{ highest_bid.amount|floatformat:2 }}{% else %}{{ item.valor_inicial|floatformat:2 }}{% endif %}" 
-                                   class="form-control" name="valor_lance" placeholder="Insira o valor do lance" required>
-                            <button class="btn btn-primary" type="submit">Enviar Lance</button>
+                                min="{% if highest_bid %}{{ highest_bid.amount|floatformat:2 }}{% else %}{{ item.valor_inicial|floatformat:2 }}{% endif %}" 
+                                class="form-control" name="valor_lance" placeholder="Insira o valor do lance" required>
+                            <button class="btn btn-primary" type="submit" {% if not request.user.arrematante.pode_dar_lance %}disabled{% endif %}>Enviar Lance</button>
                         </div>
                     </form>
                 </div>
@@ -64,8 +70,8 @@
 
             <!-- Detalhes do Item -->
             <div class="col-lg-6">
-                <div class="card p-4 shadow-sm">
-                    <h3>Informações do Item</h3>
+                <div class="card p-4 shadow-lg border-light">
+                    <h3 class="text-primario mb-3">Informações do Item</h3>
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item"><strong>Descrição:</strong> {{ item.descricao }}</li>
                         <li class="list-group-item"><strong>Valor Inicial:</strong> R$ {{ item.valor_inicial|floatformat:2 }}</li>
@@ -88,12 +94,12 @@
         </div>
 
         <!-- Detalhes do Leilão e Timer -->
-        <div class="row mt-4">
+        <div class="row mt-5">
             <div class="col-lg-12">
-                <div class="card p-4 shadow-sm">
-                    <h4>Leilão</h4>
-                    <p>Data do Leilão: {{ leilao_data|date:"d de F de Y às H:i" }}</p>
-                    <div id="countdown"></div>
+                <div class="card p-4 shadow-lg border-light">
+                    <h4 class="text-primario">Leilão</h4>
+                    <p class="lead">Data do Leilão: {{ leilao_data|date:"d de F de Y às H:i" }}</p>
+                    <div id="countdown" class="fs-4 mb-3"></div>
 
                     <!-- Botão para entrar no leilão ao vivo -->
                     <div id="liveAuctionBtn" style="display: none;">
@@ -107,7 +113,7 @@
         <div class="mt-5">
             <div>
                 {% if item_type == 'Vehicle' %}
-                    <h4>Detalhes do Veículo</h4>
+                    <h4 class="text-primario">Detalhes do Veículo</h4>
                     <ul class="list-group">
                         <li class="list-group-item"><strong>Marca:</strong> {{ item.marca }}</li>
                         <li class="list-group-item"><strong>Modelo:</strong> {{ item.modelo }}</li>
@@ -119,7 +125,7 @@
                         <li class="list-group-item"><strong>Combustível:</strong> {{ item.combustivel }}</li>
                     </ul>
                 {% elif item_type == 'RealEstate' %}
-                    <h4>Detalhes do Imóvel</h4>
+                    <h4 class="text-primario">Detalhes do Imóvel</h4>
                     <ul class="list-group">
                         <li class="list-group-item"><strong>Localização:</strong> {{ item.localizacao }}</li>
                         <li class="list-group-item"><strong>Estado do Imóvel:</strong> {{ item.estado_imovel }}</li>
@@ -127,17 +133,17 @@
                         <li class="list-group-item"><strong>Metragem:</strong> {{ item.metragem }} m²</li>
                     </ul>
                 {% elif item_type == 'Rural' %}
-                    <h4>Detalhes do Item Rural</h4>
+                    <h4 class="text-primario">Detalhes do Item Rural</h4>
                     <ul class="list-group">
                         <li class="list-group-item"><strong>Origem:</strong> {{ item.origem }}</li>
                     </ul>
                 {% elif item_type == 'OtherGoods' %}
-                    <h4>Detalhes de Outros Bens</h4>
+                    <h4 class="text-primario">Detalhes de Outros Bens</h4>
                     <ul class="list-group">
                         <li class="list-group-item"><strong>Informações adicionais:</strong> Nenhum detalhe específico disponível.</li>
                     </ul>
                 {% else %}
-                    <h4>Outras Informações</h4>
+                    <h4 class="text-primario">Outras Informações</h4>
                     <ul class="list-group">
                         <li class="list-group-item"><strong>Detalhes adicionais:</strong> Nenhum detalhe específico disponível.</li>
                     </ul>
@@ -175,6 +181,5 @@
         const countdownInterval = setInterval(updateCountdown, 1000); // Chama a função a cada 1 segundo
         updateCountdown(); // Atualiza imediatamente ao carregar
     </script>
-
 </body>
 </html>

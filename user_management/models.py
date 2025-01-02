@@ -102,6 +102,12 @@ class Arrematante(models.Model):
         choices=TIPO_CADASTRO_CHOICES,
     )
 
+    documentos_enviados = models.BooleanField(default=False)
+
+    @property
+    def pode_dar_lance(self):
+        return self.documentos_enviados 
+
     def __str__(self):
         return f"{self.user.username} - {self.get_tipo_cadastro_display()}"
 

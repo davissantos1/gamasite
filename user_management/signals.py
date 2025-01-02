@@ -2,7 +2,7 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import User
-from .models import Arrematante, Admin
+from .models import Arrematante, Admin, Documento
 
 @receiver(post_save, sender=User)
 def create_user_profiles(sender, instance, created, **kwargs):
@@ -47,3 +47,14 @@ def create_user_profiles(sender, instance, created, **kwargs):
     if instance.user_type != user_type:
         instance.user_type = user_type
         instance.save(update_fields=["user_type"])
+
+# Sinal para atualizar o campo documentos_enviados do Arrematante
+@receiver(post_save, sender=Documento)
+def update_documentos_enviados(sender, instance, **kwargs):
+    if instance.status == 'A':  # Se o status do documento foi aprovado
+        arrematante = instance.arrematante
+        # Verificar se todos os documentos do arrematante foram aprovados
+        documentos = Documento.objects.filter(arrematante=arrematante)
+        if all(doc.status == 'A' for doc in documentos):
+            arrematante.documentos_enviados = True
+            arrematante.save()

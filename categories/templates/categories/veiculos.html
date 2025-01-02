@@ -36,7 +36,7 @@
                         <p class="card-text mb-1"><strong>Marca:</strong> {{ veiculo.marca }}</p>
                         <p class="card-text"><strong>Preço estimado:</strong> R$ {{ veiculo.fipe|floatformat:2 }}</p>
                         <div class="mt-auto">
-                        <a href="#" class="btn btn-secondary btn-block">Ver Detalhes</a>
+                        <a href="{% url 'pages:item_details' veiculo.leilao.codigo_leilao veiculo.codigo_item %}" class="btn btn-secondary btn-block">Ver Detalhes</a>
                         </div>
                     </div>
                 </div>
