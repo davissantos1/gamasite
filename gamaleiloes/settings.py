@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'adminlte3',
     'adminlte3_theme',
+    'channels'
 ]
 
 MIDDLEWARE = [
@@ -194,3 +195,14 @@ LANGUAGES = [
     ('en', 'English'),
     ('pt', 'Portuguese'),
 ]
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('127.0.0.1', 6379)],  # Usando o Redis local
+        },
+    },
+}
+
+WS_PORT = os.getenv('WS_PORT', '8001')

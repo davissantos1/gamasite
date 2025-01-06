@@ -17,36 +17,133 @@
     </video>
 </div>
 
+<!-- Exibição dos itens do leilão -->
+<h3>Itens em Leilão</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Nome</th>
+            <th scope="col">Tipo</th>
+            <th scope="col">Valor Inicial</th>
+            <th scope="col">Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in auction.vehicles.all %}
+            <tr>
+                <td>{{ item.nome }}</td>
+                <td>Veículo</td>
+                <td>R$ {{ item.valor_inicial|floatformat:2 }}</td>
+                <td>
+                    <a href="{% url 'admin:auction_management_auction_change' auction.codigo_leilao %}" class="btn btn-info">Selecionar</a>
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="4">Não há itens disponíveis.</td>
+            </tr>
+        {% endfor %}
+
+        {% for item in auction.real_estates.all %}
+            <tr>
+                <td>{{ item.nome }}</td>
+                <td>Imóvel</td>
+                <td>R$ {{ item.valor_inicial|floatformat:2 }}</td>
+                <td>
+                    <a href="{% url 'admin:auction_management_auction_change' auction.codigo_leilao %}" class="btn btn-info">Selecionar</a>
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="4">Não há itens disponíveis.</td>
+            </tr>
+        {% endfor %}
+
+        {% for item in auction.rural_items.all %}
+            <tr>
+                <td>{{ item.nome }}</td>
+                <td>Item Rural</td>
+                <td>R$ {{ item.valor_inicial|floatformat:2 }}</td>
+                <td>
+                    <a href="{% url 'admin:auction_management_auction_change' auction.codigo_leilao %}" class="btn btn-info">Selecionar</a>
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="4">Não há itens disponíveis.</td>
+            </tr>
+        {% endfor %}
+
+        {% for item in auction.other_goods.all %}
+            <tr>
+                <td>{{ item.nome }}</td>
+                <td>Outros Bens</td>
+                <td>R$ {{ item.valor_inicial|floatformat:2 }}</td>
+                <td>
+                    <a href="{% url 'admin:auction_management_auction_change' auction.codigo_leilao %}" class="btn btn-info">Selecionar</a>
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="4">Não há itens disponíveis.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
 <!-- Exibição do item atual -->
-<h3>Item em Leilão: {{ auction.vehicles.first.nome }}</h3> <!-- Alterado para mostrar o primeiro item -->
+{% if auction.current_item %}
+<h3>Item em Leilão: {{ auction.current_item.nome }}</h3>
 <div class="auction-item">
-    <h4>{{ auction.vehicles.first.nome }} - Veículo</h4>
-    <img src="{{ auction.vehicles.first.thumbnail.url }}" alt="{{ auction.vehicles.first.nome }}" class="img-thumbnail" style="width: 200px;">
-    <p>{{ auction.vehicles.first.descricao }}</p>
-    <p><strong>Valor Inicial:</strong> R$ {{ auction.vehicles.first.valor_inicial|floatformat:2 }}</p>
+    <h4>{{ auction.current_item.nome }} - {{ auction.current_item.tipo }}</h4>
+    <img src="{{ auction.current_item.thumbnail.url }}" alt="{{ auction.current_item.nome }}" class="img-thumbnail" style="width: 200px;">
+    <p>{{ auction.current_item.descricao }}</p>
+    <p><strong>Valor Inicial:</strong> R$ {{ auction.current_item.valor_inicial|floatformat:2 }}</p>
 
     <!-- Exibição dos lances realizados -->
     <h4>Lances Realizados:</h4>
     <ul>
-        {% for bid in auction.vehicles.first.bids.all %}
-            <li><strong>{{ bid.usuario.username }}:</strong> R$ {{ bid.valor|floatformat:2 }}</li>
+        {% for bid in auction.current_item.bids.all|dictsort:'-valor' %}
+            <li>
+                <strong>{{ bid.usuario.username }}:</strong> R$ {{ bid.valor|floatformat:2 }}
+                {% if forloop.first %}
+                <!-- Botão para definir o lance vencedor -->
+                <a href="{% url 'admin:set_winner_bid' auction.codigo_leilao auction.current_item.id bid.id %}" class="btn btn-success btn-sm">Definir Vencedor</a>
+                {% endif %}
+            </li>
         {% empty %}
             <li>Não houve lances ainda.</li>
         {% endfor %}
     </ul>
-
-    <!-- Formulário para definir o lance vencedor -->
-    <form action="" method="POST">
-        {% csrf_token %}
-        <label for="lance_vencedor">Definir Lance Vencedor (R$):</label>
-        <input type="number" name="lance_vencedor" min="{{ auction.vehicles.first.valor_inicial }}" required>
-        <button type="submit" class="btn btn-success">Definir Vencedor</button>
-    </form>
-
-    <!-- Botões de navegação -->
-    <div class="mt-3">
-        <a href="" class="btn btn-primary">Próximo Item</a>
-    </div>
 </div>
+{% else %}
+<p>Nenhum item está sendo leiloado no momento.</p>
+{% endif %}
+
+<script>
+    const socket = new WebSocket('{{ ws_url }}');
+
+    socket.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        console.log('Message received:', data.message);
+        // Atualize a interface com o novo item
+        document.getElementById('auction-item').innerText = data.message;
+    };
+
+    socket.onopen = function() {
+        console.log('WebSocket connection established');
+    };
+
+    socket.onclose = function() {
+        console.log('WebSocket connection closed');
+    };
+
+    function nextItem() {
+        socket.send(JSON.stringify({
+            'action': 'next_item',
+            'message': 'Ir para o próximo item'
+        }));
+    }
+</script>
 
 {% endblock %}

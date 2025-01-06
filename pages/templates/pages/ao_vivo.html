@@ -33,31 +33,33 @@
 
             <hr>
 
-            <!-- Itens do Leilão -->
-            <div class="auction-items">
-                <h3 class="h4 mb-3">Itens em Leilão</h3>
-                {% for item in auction.items %}
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <h4 class="card-title">{{ item.nome }} - {{ item.tipo }}</h4>
-                            <img src="{{ item.thumbnail.url }}" alt="{{ item.nome }}" class="img-fluid mb-3">
-                            <p>{{ item.descricao }}</p>
-                            <p><strong>Valor Inicial:</strong> R$ {{ item.valor_inicial|floatformat:2 }}</p>
-                            <p><strong>Valor Avaliado:</strong> R$ {{ item.valor_avaliado|floatformat:2 }}</p>
-                            
-                            <!-- Formulário de Lance -->
-                            <form action="{% url 'pages:create_bid' item.leilao.codigo_leilao item.codigo_item %}" method="POST">
-                                {% csrf_token %}
-                                <div class="form-group">
-                                    <label for="lance">Seu lance (R$):</label>
-                                    <input type="number" name="lance" class="form-control" min="{{ item.valor_inicial }}" required>
-                                </div>
-                                <button type="submit" class="btn btn-primary">Fazer Lance</button>
-                            </form>
-                        </div>
-                    </div>
-                {% endfor %}
+            <!-- Exibição do item atual do leilão -->
+            <div class="auction-item" id="auction-item">
+                <h4>{{ auction.current_item.nome }} - {{ auction.current_item.tipo }}</h4>
+                <img src="{{ auction.current_item.thumbnail.url }}" alt="{{ auction.current_item.nome }}" class="img-thumbnail" style="width: 200px;">
+                <p>{{ auction.current_item.descricao }}</p>
+                <p><strong>Valor Inicial:</strong> R$ {{ auction.current_item.valor_inicial|floatformat:2 }}</p>
             </div>
+
+            <!-- Exibição dos lances realizados -->
+            <div class="auction-bids">
+                <h3>Lances Realizados</h3>
+                <ul id="bids-list">
+                    {% for bid in auction.current_item.bids.all|dictsort:'-valor' %}
+                        <li><strong>{{ bid.usuario.username }}:</strong> R$ {{ bid.valor|floatformat:2 }}</li>
+                    {% empty %}
+                        <li>Não houve lances ainda.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Envio de lance -->
+            <div class="place-bid">
+                <h4>Faça seu Lance</h4>
+                <input type="number" id="bid-value" class="form-control" placeholder="Insira o valor do lance" min="{{ auction.current_item.valor_inicial }}" step="0.01">
+                <button id="place-bid-btn" class="btn btn-primary mt-3">Fazer Lance</button>
+            </div>
+
         </div>
 
         <div class="col-md-4">
@@ -78,4 +80,61 @@
         </div>
     </div>
 </div>
+
+<script>
+    const socket = new WebSocket('{{ ws_url }}');
+
+    socket.onopen = function() {
+        console.log('WebSocket connected');
+        // Envia a solicitação inicial para obter dados do item
+        socket.send(JSON.stringify({
+            'action': 'get_item_data'
+        }));
+    };
+
+    socket.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        console.log('Message received:', data);
+    
+        // Atualiza os dados do item
+        if (data.item) {
+            const itemElement = document.getElementById('auction-item');
+            itemElement.innerHTML = `
+                <h4>${data.item.nome} - ${data.item.tipo}</h4>
+                <img src="${data.item.thumbnail_url}" alt="${data.item.nome}" class="img-thumbnail" style="width: 200px;">
+                <p>${data.item.descricao}</p>
+                <p><strong>Valor Inicial:</strong> R$ ${data.item.valor_inicial}</p>
+            `;
+        }
+    
+        // Atualiza os lances
+        if (data.bids) {
+            const bidsList = document.getElementById('bids-list');
+            bidsList.innerHTML = data.bids.map(bid => `
+                <li><strong>${bid.usuario}:</strong> R$ ${bid.valor}</li>
+            `).join('');
+        }
+    };
+    
+
+    socket.onclose = function() {
+        console.log('WebSocket closed');
+    };
+
+    socket.onerror = function(error) {
+        console.log('WebSocket Error: ', error);
+    };
+
+    // Envia o lance quando o botão for clicado
+    document.getElementById('place-bid-btn').addEventListener('click', function() {
+        const bidValue = document.getElementById('bid-value').value;
+        if (bidValue) {
+            socket.send(JSON.stringify({
+                'action': 'place_bid',
+                'bid_value': bidValue
+            }));
+        }
+    });
+</script>
+
 {% endblock %}

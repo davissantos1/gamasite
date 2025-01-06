@@ -98,7 +98,7 @@
                                                 {{ leilao.get_status_display }}
                                             </span>
                                         </td>
-                                        <td><a href="#" class="btn btn-primary btn-sm">Ver Detalhes</a></td>
+                                        <td><a href="{% url 'pages:leilao_detalhe' leilao.codigo_leilao %}" class="btn btn-success btn-sm">Ver Detalhes</a></td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
@@ -133,7 +133,7 @@
                                         <td>{{ lote.item.nome }}</td>
                                         <td>{{ lote.item.descricao|truncatewords:10 }}</td>
                                         <td>{{ lote.item.codigo_item }}</td>
-                                        <td><a href="#" class="btn btn-success btn-sm">Ver Detalhes</a></td>
+                                        <td><a href="{% url 'pages:item_details' lote.item.leilao.codigo_leilao lote.item.codigo_item %}" class="btn btn-success btn-sm">Ver Detalhes</a></td>
                                     </tr>
                                 {% endfor %}
                             </tbody>

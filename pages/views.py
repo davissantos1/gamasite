@@ -11,8 +11,7 @@ from django.contrib import messages
 from django.utils.timezone import localtime
 from django.utils import timezone
 from django.http import HttpResponseForbidden
-
-
+from django.conf import settings
 
 def index(request):
     # Criar um dicionário para armazenar itens destacados por categoria
@@ -155,17 +154,29 @@ def ao_vivo(request, codigo_leilao):
     rural_items = RuralItem.objects.filter(leilao=auction)
     other_goods = OtherGoods.objects.filter(leilao=auction)
 
+    # Configurar o esquema e a porta manualmente
+    ws_scheme = 'ws'
+
+    port = settings.WS_PORT
+
+    # Se for produção e usando HTTPS, ajuste para wss
+    # if request.is_secure():
+    #   ws_scheme = 'wss'
+    #   port = '443'
+
     # Contexto para o template
     context = {
         'auction': auction,
         'vehicles': vehicles,
         'real_estates': real_estates,
         'rural_items': rural_items,
-        'other_goods': other_goods
+        'other_goods': other_goods,
+        'ws_url': f'{ws_scheme}://{request.get_host().split(":")[0]}:{port}/ws/auction/{codigo_leilao}/'
     }
 
     # Renderiza a página ao vivo com todos os itens
     return render(request, 'pages/ao_vivo.html', context)
+
 
 @login_required
 def inicio(request):

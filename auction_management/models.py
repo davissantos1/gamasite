@@ -79,12 +79,6 @@ def generate_auction_thumb_path(instance, filename):
 
     return f"thumbnail/leilao/{leilao_codigo}/{filename}"
 
-from datetime import timedelta
-from django.db import models
-from django.db.models.signals import pre_save
-from django.dispatch import receiver
-from django.utils.timezone import now
-
 class Auction(models.Model):
     STATUS_CHOICES = [
         ('programado', 'Programado'),
@@ -170,13 +164,6 @@ class Auction(models.Model):
     class Meta:
         verbose_name = "Leilão"
         verbose_name_plural = "Leilões"
-
-
-# Signal para garantir que o status seja atualizado automaticamente antes de salvar
-@receiver(pre_save, sender=Auction)
-def auto_update_status(sender, instance, **kwargs):
-    instance.update_status()
-
 
 class BaseItem(models.Model):
     nome = models.CharField(
